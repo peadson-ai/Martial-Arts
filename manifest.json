@@ -1,0 +1,10 @@
+{
+  "name": "STRIKE//OS — Dutch MMA & Boxing Heavy Bag Timer",
+  "short_name": "STRIKE//OS",
+  "description": "Dutch MMA, Kickboxing & Boxing Heavy Bag Round Timer with Strict L-R Alternating Voice Callouts and Polar BLE Heart Rate Telemetry.",
+  "start_url": "./index.html",
+  "display": "standalone",
+  "background_color": "#07090e",
+  "theme_color": "#07090e",
+  "orientation": "any"
+}

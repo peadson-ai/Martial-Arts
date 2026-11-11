@@ -1,0 +1,502 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <meta name="theme-color" content="#07090e" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <title>STRIKE//OS — Dutch MMA &amp; Boxing Heavy Bag Timer + Polar HR</title>
+  <link rel="manifest" href="manifest.json" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:ital,wght@0,600;0,700;0,800;0,900;1,800&family=JetBrains+Mono:wght@500;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body data-phase="idle" data-discipline="dutch-mma">
+  <!-- Ambient Arena Lighting Backdrop -->
+  <div class="arena-backdrop" aria-hidden="true">
+    <div class="arena-glow glow-primary"></div>
+    <div class="arena-glow glow-secondary"></div>
+    <div class="arena-grid-overlay"></div>
+  </div>
+
+  <div class="app-shell">
+    <!-- Top Tactical Telemetry Bar -->
+    <header class="top-nav">
+      <div class="brand-lockup">
+        <div class="brand-emblem">
+          <svg viewBox="0 0 36 36" fill="none" aria-hidden="true">
+            <path d="M6 10L18 3L30 10V26L18 33L6 26V10Z" stroke="currentColor" stroke-width="2.5"/>
+            <path d="M12 18H24M18 11V25" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"/>
+          </svg>
+        </div>
+        <div class="brand-titles">
+          <div class="brand-kicker">HEAVY BAG TELEMETRY &bull; ALTERNATING L&harr;R &bull; POLAR BLE</div>
+          <h1 class="brand-name">STRIKE<span>//</span>OS</h1>
+        </div>
+      </div>
+
+      <!-- Quick Discipline Switcher (Instant Access) -->
+      <div class="mode-switcher" role="tablist" aria-label="Combat Discipline">
+        <button class="mode-pill active" data-mode="dutch-mma" role="tab" aria-selected="true" type="button">
+          <span class="mode-dot"></span>Dutch MMA
+        </button>
+        <button class="mode-pill" data-mode="dutch-kickboxing" role="tab" aria-selected="false" type="button">
+          <span class="mode-dot"></span>Dutch Kickboxing
+        </button>
+        <button class="mode-pill" data-mode="boxing" role="tab" aria-selected="false" type="button">
+          <span class="mode-dot"></span>Pure Boxing
+        </button>
+        <button class="mode-pill" data-mode="procedural" role="tab" aria-selected="false" type="button">
+          <span class="mode-dot"></span>Procedural L&harr;R
+        </button>
+      </div>
+
+      <!-- Right Utility Actions (Polar HR Connect, Wake Lock & Fullscreen) -->
+      <div class="nav-utilities">
+        <button id="polar-connect-btn" class="polar-btn" type="button" title="Connect Polar H10 / H9 / Verity Sense via Bluetooth">
+          <span class="heart-icon" id="nav-heart-icon">&#x2665;</span>
+          <span id="polar-btn-label">CONNECT POLAR HR</span>
+        </button>
+        <button id="fullscreen-btn" class="utility-btn" type="button" title="Toggle Fullscreen Gym Mode">
+          &#x26F6; FULLSCREEN
+        </button>
+      </div>
+    </header>
+
+    <!-- Main Command Deck -->
+    <main class="command-deck">
+      <!-- LEFT COLUMN: Primary Chrono Stage, Polar Biometrics & Live Combo Visualizer -->
+      <section class="chrono-stage" aria-live="polite">
+        <!-- Top Status Strip inside Stage -->
+        <div class="stage-telemetry-header">
+          <div class="phase-indicator">
+            <span class="pulse-beacon"></span>
+            <span id="phase-label" class="phase-text">STANDBY &bull; GLOVES ON</span>
+          </div>
+
+          <div class="round-matrix">
+            <span class="matrix-label">ROUND</span>
+            <span id="round-counter" class="matrix-value">01 <small>/ 05</small></span>
+            <div id="round-pips" class="round-pips" aria-hidden="true"></div>
+          </div>
+        </div>
+
+        <!-- Centerpiece: Radial Chrono + 3D Heavy Bag Target Visualizer -->
+        <div class="centerpiece-grid">
+          <!-- Radial SVG Chrono Ring -->
+          <div class="chrono-dial-container">
+            <svg class="chrono-svg" viewBox="0 0 320 320" aria-hidden="true">
+              <defs>
+                <linearGradient id="ringGradWork" x1="0%" y1="0%" x2="100%" y2="100%">
+                  <stop offset="0%" stop-color="#34d399" />
+                  <stop offset="100%" stop-color="#059669" />
+                </linearGradient>
+                <linearGradient id="ringGradPrep" x1="0%" y1="0%" x2="100%" y2="100%">
+                  <stop offset="0%" stop-color="#fbbf24" />
+                  <stop offset="100%" stop-color="#d97706" />
+                </linearGradient>
+                <linearGradient id="ringGradWarn" x1="0%" y1="0%" x2="100%" y2="100%">
+                  <stop offset="0%" stop-color="#fb923c" />
+                  <stop offset="100%" stop-color="#e11d48" />
+                </linearGradient>
+                <linearGradient id="ringGradRest" x1="0%" y1="0%" x2="100%" y2="100%">
+                  <stop offset="0%" stop-color="#38bdf8" />
+                  <stop offset="100%" stop-color="#2563eb" />
+                </linearGradient>
+                <radialGradient id="dialFaceGrad" cx="50%" cy="45%" r="55%">
+                  <stop offset="0%" stop-color="rgba(18, 26, 41, 0.9)" />
+                  <stop offset="100%" stop-color="rgba(7, 10, 16, 0.96)" />
+                </radialGradient>
+              </defs>
+              <circle class="dial-bezel" cx="160" cy="160" r="154" />
+              <circle class="dial-ticks" cx="160" cy="160" r="146" />
+              <circle class="dial-track" cx="160" cy="160" r="132" fill="url(#dialFaceGrad)" />
+              <circle id="dial-progress" class="dial-progress" cx="160" cy="160" r="132" />
+            </svg>
+
+            <div class="chrono-readout">
+              <div id="discipline-badge" class="discipline-readout-tag">DUTCH MMA &bull; STRICT L&harr;R</div>
+              <div id="time-display" class="time-numerals">03:00</div>
+              <div class="chrono-submetrics">
+                <div class="submetric">
+                  <span class="sub-lbl">COMBOS</span>
+                  <span id="stat-combos" class="sub-val">0</span>
+                </div>
+                <div class="submetric-divider"></div>
+                <div class="submetric">
+                  <span class="sub-lbl">BAG TIME</span>
+                  <span id="stat-work-time" class="sub-val">00:00</span>
+                </div>
+                <div class="submetric-divider"></div>
+                <div class="submetric">
+                  <span class="sub-lbl">PEAK HR</span>
+                  <span id="stat-peak-hr" class="sub-val">--</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- 3D Heavy Bag Strike Zone Visualizer -->
+          <div class="bag-visualizer-card">
+            <div class="bag-header">
+              <span class="bag-title">KINETIC BAG TARGETS</span>
+              <div class="stance-legend">
+                <span class="legend-item lead-item"><i class="dot-lead"></i>LEAD (L)</span>
+                <span class="legend-item rear-item"><i class="dot-rear"></i>REAR (R)</span>
+              </div>
+            </div>
+
+            <div class="bag-svg-wrap" id="bag-swing-wrapper">
+              <svg id="heavy-bag-svg" class="heavy-bag-svg" viewBox="0 0 180 284" aria-label="Heavy Bag Strike Zones">
+                <defs>
+                  <linearGradient id="bagLeatherGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+                    <stop offset="0%" stop-color="#090d16" />
+                    <stop offset="22%" stop-color="#1e293b" />
+                    <stop offset="45%" stop-color="#0f172a" />
+                    <stop offset="82%" stop-color="#090d16" />
+                    <stop offset="100%" stop-color="#05070c" />
+                  </linearGradient>
+                  <linearGradient id="strapGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+                    <stop offset="0%" stop-color="#64748b" />
+                    <stop offset="100%" stop-color="#334155" />
+                  </linearGradient>
+                </defs>
+
+                <rect x="74" y="2" width="32" height="7" rx="3.5" fill="#64748b" />
+                <circle cx="90" cy="12" r="4" fill="#94a3b8" />
+                <path d="M90 14 L54 40 M90 14 L126 40 M90 14 L90 40" stroke="url(#strapGrad)" stroke-width="3.5" stroke-linecap="round"/>
+
+                <rect x="36" y="38" width="108" height="232" rx="24" fill="url(#bagLeatherGrad)" stroke="#334155" stroke-width="2.5"/>
+                <path d="M38 56 H142" stroke="#475569" stroke-width="2" opacity="0.6"/>
+                <path d="M38 250 H142" stroke="#475569" stroke-width="2" opacity="0.6"/>
+
+                <line x1="90" y1="42" x2="90" y2="266" stroke="rgba(148, 163, 184, 0.18)" stroke-width="1.5" stroke-dasharray="4 4"/>
+                <line x1="40" y1="115" x2="140" y2="115" stroke="rgba(148, 163, 184, 0.16)" stroke-width="1.5"/>
+                <line x1="40" y1="188" x2="140" y2="188" stroke="rgba(148, 163, 184, 0.16)" stroke-width="1.5"/>
+
+                <rect id="zone-head-L" class="bag-zone zone-L" x="43" y="47" width="43" height="62" rx="11" />
+                <circle cx="64.5" cy="72" r="8" class="reticle-ring" />
+                <text x="64.5" y="96" class="zone-label">HEAD L</text>
+
+                <rect id="zone-head-R" class="bag-zone zone-R" x="94" y="47" width="43" height="62" rx="11" />
+                <circle cx="115.5" cy="72" r="8" class="reticle-ring" />
+                <text x="115.5" y="96" class="zone-label">HEAD R</text>
+
+                <rect id="zone-body-L" class="bag-zone zone-L" x="43" y="121" width="43" height="61" rx="10" />
+                <circle cx="64.5" cy="146" r="8" class="reticle-ring" />
+                <text x="64.5" y="170" class="zone-label">BODY L</text>
+
+                <rect id="zone-body-R" class="bag-zone zone-R" x="94" y="121" width="43" height="61" rx="10" />
+                <circle cx="115.5" cy="146" r="8" class="reticle-ring" />
+                <text x="115.5" y="170" class="zone-label">BODY R</text>
+
+                <rect id="zone-low-L" class="bag-zone zone-L" x="43" y="194" width="43" height="64" rx="11" />
+                <circle cx="64.5" cy="220" r="8" class="reticle-ring" />
+                <text x="64.5" y="245" class="zone-label">LOW L</text>
+
+                <rect id="zone-low-R" class="bag-zone zone-R" x="94" y="194" width="43" height="64" rx="11" />
+                <circle cx="115.5" cy="220" r="8" class="reticle-ring" />
+                <text x="115.5" y="245" class="zone-label">LOW R</text>
+              </svg>
+            </div>
+            <div id="bag-active-callout" class="bag-active-callout">Alternating L &rarr; R Flow Ready</div>
+          </div>
+        </div>
+
+        <!-- Polar BLE Heart Rate Biometrics Telemetry Strip -->
+        <div class="polar-telemetry-strip" id="polar-strip" data-hr-zone="0">
+          <div class="polar-left">
+            <div class="bpm-readout-box">
+              <span class="bpm-heart" id="bpm-heart-anim">&#x2665;</span>
+              <span id="bpm-value" class="bpm-numerals">--</span>
+              <div class="bpm-unit-stack">
+                <span class="bpm-unit">BPM</span>
+                <span id="hr-pct-max" class="bpm-pct">--% MAX</span>
+              </div>
+            </div>
+            <div class="polar-meta">
+              <div class="polar-device-row">
+                <span id="polar-status-text" class="polar-device-name">POLAR BLE SENSOR: STANDBY</span>
+                <span id="polar-zone-pill" class="hr-zone-pill">ZONE --</span>
+              </div>
+              <div class="hr-zone-bar" aria-label="Heart Rate Training Zone">
+                <div class="hr-zone-seg z1"><span>Z1</span></div>
+                <div class="hr-zone-seg z2"><span>Z2</span></div>
+                <div class="hr-zone-seg z3"><span>Z3</span></div>
+                <div class="hr-zone-seg z4"><span>Z4</span></div>
+                <div class="hr-zone-seg z5"><span>Z5</span></div>
+                <div id="hr-zone-marker" class="hr-zone-marker" style="left: 0%"></div>
+              </div>
+            </div>
+          </div>
+
+          <div class="polar-right">
+            <canvas id="hr-sparkline" width="160" height="44" aria-label="Live Heart Rate Trend"></canvas>
+            <div class="polar-Quick-actions">
+              <div class="hrr-metric" title="Heart Rate Recovery Drop during Rest">
+                <span class="sub-lbl">RECOVERY</span>
+                <span id="stat-hrr" class="sub-val">-- BPM</span>
+              </div>
+              <button id="polar-sim-btn" class="action-chip" type="button" title="Simulate Polar H10 Live Stream">
+                Sim HR
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Live Combination Telemetry Deck -->
+        <div class="combo-telemetry-deck" id="combo-stage">
+          <div class="combo-deck-top">
+            <div class="combo-deck-titles">
+              <span class="combo-kicker">LIVE COMBINATION CALLOUT</span>
+              <span id="alternating-proof-badge" class="alt-proof-badge">&#x2714; STRICT L&harr;R ALTERNATING</span>
+            </div>
+            <div class="combo-deck-actions">
+              <button id="prev-combo-btn" class="action-chip" type="button" title="Replay current combination voice">
+                &#x1F501; Replay
+              </button>
+              <button id="trigger-combo-btn" class="action-chip accent-chip" type="button" title="Call next combination immediately">
+                &#x1F50A; Call Next Combo
+              </button>
+            </div>
+          </div>
+
+          <!-- Headline Spoken Text -->
+          <div id="combo-display" class="combo-headline">
+            Jab &ndash; Cross &ndash; Lead Hook &ndash; Rear Low Kick
+          </div>
+
+          <!-- Alternating Strike Cards Strip -->
+          <div id="combo-breakdown" class="strike-chain-grid" aria-label="Strike sequence breakdown"></div>
+        </div>
+
+        <!-- Glove-Friendly Transport Dock -->
+        <div class="transport-dock">
+          <button id="start-pause-btn" class="dock-btn btn-start" type="button">
+            <span class="btn-icon" id="start-pause-icon">&#x25B6;</span>
+            <span id="start-pause-label">START WORKOUT</span>
+          </button>
+          <button id="skip-phase-btn" class="dock-btn btn-skip" type="button" disabled>
+            <span>SKIP PHASE &raquo;</span>
+          </button>
+          <button id="reset-btn" class="dock-btn btn-reset" type="button">
+            <span>RESET</span>
+          </button>
+        </div>
+      </section>
+
+      <!-- RIGHT COLUMN: Precision Control & Voice Studio -->
+      <aside class="control-tower">
+        <!-- Card 1: Round & Interval Architecture -->
+        <section class="tower-card">
+          <div class="tower-card-header">
+            <div>
+              <span class="card-kicker">INTERVAL ARCHITECTURE</span>
+              <h2>Round &amp; Timer Controls</h2>
+            </div>
+            <button id="sound-bell-test-btn" class="action-chip" type="button" title="Test Gym Bell Audio">
+              &#x1F514; Test Bell
+            </button>
+          </div>
+
+          <!-- Quick Camp Presets Strip inside Interval Card -->
+          <div class="preset-strip" aria-label="Camp Presets">
+            <button class="preset-chip active" data-preset="dutch-5x3" type="button">5&times;3:00 Dutch</button>
+            <button class="preset-chip" data-preset="mma-3x5" type="button">3&times;5:00 MMA</button>
+            <button class="preset-chip" data-preset="champ-5x5" type="button">5&times;5:00 Champ</button>
+            <button class="preset-chip" data-preset="boxing-10x3" type="button">10&times;3:00 Boxing</button>
+            <button class="preset-chip" data-preset="tabata-8x1" type="button">8&times;1:00 Burnout</button>
+          </div>
+
+          <div class="param-list">
+            <div class="param-row">
+              <div class="param-meta">
+                <label for="rounds-input">Total Rounds</label>
+                <span class="param-sub">Number of bag rounds</span>
+              </div>
+              <div class="param-controls">
+                <button class="step-btn" data-target="rounds-input" data-step="-1" type="button">&minus;</button>
+                <input id="rounds-input" type="number" min="1" max="30" value="5" />
+                <button class="step-btn" data-target="rounds-input" data-step="1" type="button">+</button>
+                <span id="rounds-formatted" class="param-badge">5 RDS</span>
+              </div>
+            </div>
+
+            <div class="param-row">
+              <div class="param-meta">
+                <label for="work-sec-input">Round Work Time</label>
+                <span class="param-sub">Active striking duration</span>
+              </div>
+              <div class="param-controls">
+                <button class="step-btn" data-target="work-sec-input" data-step="-15" type="button">&minus;15s</button>
+                <input id="work-sec-input" type="number" min="15" max="1800" step="5" value="180" />
+                <button class="step-btn" data-target="work-sec-input" data-step="15" type="button">+15s</button>
+                <span id="work-formatted" class="param-badge">03:00</span>
+              </div>
+            </div>
+
+            <div class="param-row">
+              <div class="param-meta">
+                <label for="rest-sec-input">Rest Period</label>
+                <span class="param-sub">Recovery between rounds</span>
+              </div>
+              <div class="param-controls">
+                <button class="step-btn" data-target="rest-sec-input" data-step="-15" type="button">&minus;15s</button>
+                <input id="rest-sec-input" type="number" min="5" max="600" step="5" value="60" />
+                <button class="step-btn" data-target="rest-sec-input" data-step="15" type="button">+15s</button>
+                <span id="rest-formatted" class="param-badge">01:00</span>
+              </div>
+            </div>
+
+            <div class="param-row">
+              <div class="param-meta">
+                <label for="prep-sec-input">Start-Up Time</label>
+                <span class="param-sub">Glove-up prep countdown</span>
+              </div>
+              <div class="param-controls">
+                <button class="step-btn" data-target="prep-sec-input" data-step="-5" type="button">&minus;5s</button>
+                <input id="prep-sec-input" type="number" min="0" max="120" step="5" value="10" />
+                <button class="step-btn" data-target="prep-sec-input" data-step="5" type="button">+5s</button>
+                <span id="prep-formatted" class="param-badge">00:10</span>
+              </div>
+            </div>
+
+            <div class="param-row">
+              <div class="param-meta">
+                <label for="warn-sec-input">Final Burnout Warning</label>
+                <span class="param-sub">Clapper cue before bell</span>
+              </div>
+              <div class="param-controls">
+                <button class="step-btn" data-target="warn-sec-input" data-step="-5" type="button">&minus;5s</button>
+                <input id="warn-sec-input" type="number" min="0" max="60" step="5" value="10" />
+                <button class="step-btn" data-target="warn-sec-input" data-step="5" type="button">+5s</button>
+                <span id="warn-formatted" class="param-badge">00:10</span>
+              </div>
+            </div>
+
+            <div class="param-row">
+              <div class="param-meta">
+                <label for="max-hr-input">Max Heart Rate</label>
+                <span class="param-sub">For Polar Zone 1&ndash;5 calibration</span>
+              </div>
+              <div class="param-controls">
+                <button class="step-btn" data-target="max-hr-input" data-step="-5" type="button">&minus;5</button>
+                <input id="max-hr-input" type="number" min="140" max="220" step="1" value="190" />
+                <button class="step-btn" data-target="max-hr-input" data-step="5" type="button">+5</button>
+                <span id="max-hr-formatted" class="param-badge">190 BPM</span>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- Card 2: Dutch Alternating Engine & Voice Selector -->
+        <section class="tower-card">
+          <div class="tower-card-header">
+            <div>
+              <span class="card-kicker">VOICE &amp; STRIKE CALLER</span>
+              <h2>Combinations &amp; Announcer</h2>
+            </div>
+            <label class="cyber-toggle" title="Toggle Voice Combo Callouts">
+              <input type="checkbox" id="combo-enabled-toggle" checked />
+              <span class="cyber-toggle-track">
+                <span class="cyber-toggle-thumb"></span>
+              </span>
+              <span class="cyber-toggle-lbl">ACTIVE</span>
+            </label>
+          </div>
+
+          <div class="form-grid">
+            <div class="field-block">
+              <label for="combo-style-select">Striking Style / Arsenal</label>
+              <select id="combo-style-select">
+                <option value="dutch-mma" selected>Dutch MMA (Alternating 8-Limbs + Sprawl L&harr;R)</option>
+                <option value="dutch-kickboxing">Dutch Kickboxing (Alternating Hands + Kicks/Knees L&harr;R)</option>
+                <option value="boxing">Pure Boxing Only (Alternating Punches + Defense L&harr;R)</option>
+                <option value="procedural">Procedural Alternating Engine (Dynamic L&harr;R Chains)</option>
+                <option value="custom-only">Custom User Combinations Only</option>
+              </select>
+            </div>
+
+            <div class="field-row-2col">
+              <div class="field-block">
+                <label for="callout-mode-select">Callout Terminology</label>
+                <select id="callout-mode-select">
+                  <option value="named" selected>Named (Jab, Cross, Hook...)</option>
+                  <option value="numbered">Numbered (1, 2, 3, Low Kick...)</option>
+                </select>
+              </div>
+
+              <div class="field-block">
+                <label for="combo-pace-select">Callout Interval</label>
+                <select id="combo-pace-select">
+                  <option value="slow">Technical (Every 9&ndash;12s)</option>
+                  <option value="medium" selected>Fight Pace (Every 6&ndash;8s)</option>
+                  <option value="fast">Dutch Volume (Every 3.5&ndash;5s)</option>
+                </select>
+              </div>
+            </div>
+
+            <!-- Voice Selection Studio -->
+            <div class="voice-studio-box">
+              <div class="voice-studio-header">
+                <label for="voice-select">Select Announcer Voice</label>
+                <button id="test-voice-btn" class="action-chip accent-chip" type="button">
+                  &#x1F399; Test Voice
+                </button>
+              </div>
+
+              <!-- Quick Voice Persona Presets -->
+              <div class="persona-pills" role="group" aria-label="Voice Persona Presets">
+                <button type="button" class="persona-pill active" data-persona="coach">Corner Coach</button>
+                <button type="button" class="persona-pill" data-persona="announcer">Heavy Announcer</button>
+                <button type="button" class="persona-pill" data-persona="padholder">Fast Pad Holder</button>
+                <button type="button" class="persona-pill" data-persona="crisp">Crisp Technical</button>
+              </div>
+
+              <select id="voice-select" aria-label="System Speech Synthesis Voice">
+                <option value="">Loading System Voices...</option>
+              </select>
+
+              <div class="voice-sliders-row">
+                <div class="range-field">
+                  <div class="range-top">
+                    <label for="voice-rate-input">Cadence Speed</label>
+                    <span id="voice-rate-val" class="mono-val">1.10x</span>
+                  </div>
+                  <input id="voice-rate-input" type="range" min="0.8" max="1.6" step="0.05" value="1.1" />
+                </div>
+
+                <div class="range-field">
+                  <div class="range-top">
+                    <label for="voice-pitch-input">Voice Pitch</label>
+                    <span id="voice-pitch-val" class="mono-val">0.95</span>
+                  </div>
+                  <input id="voice-pitch-input" type="range" min="0.6" max="1.4" step="0.05" value="0.95" />
+                </div>
+              </div>
+            </div>
+
+            <!-- Custom Combination Builder -->
+            <div class="custom-builder-box">
+              <label for="custom-combo-input">Add Custom Alternating Combo</label>
+              <div class="custom-builder-row">
+                <input
+                  id="custom-combo-input"
+                  type="text"
+                  placeholder="e.g. Jab, Cross, Lead Body Hook, Rear Low Kick"
+                />
+                <button id="add-combo-btn" class="action-chip accent-chip" type="button">+ Add</button>
+              </div>
+              <ul id="custom-combo-list" class="custom-combo-list"></ul>
+            </div>
+          </div>
+        </section>
+      </aside>
+    </main>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>
