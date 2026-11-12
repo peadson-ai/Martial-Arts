@@ -879,16 +879,18 @@
     } catch (_) {}
   }
 
+  let audioSessionConfigured = false;
   function configureMobileAudioSession() {
+    if (audioSessionConfigured) return;
     try {
       if ("audioSession" in navigator && navigator.audioSession) {
         navigator.audioSession.type = "playback";
+        audioSessionConfigured = true;
       }
     } catch (_) {}
   }
 
   function ensureAudioCtx() {
-    configureMobileAudioSession();
     try {
       if (!audioCtx) {
         const AC = window.AudioContext || window.webkitAudioContext;
@@ -903,10 +905,13 @@
 
   function unlockMobileSpeechAndAudio(willSpeakImmediately = false) {
     configureMobileAudioSession();
-    playHtmlWav("unlock", 0.02);
+    // Only play the HTML5 WAV unlocker once before speech starts so <audio>.play() never steals mobile audio focus from speechSynthesis
+    if (!state.speechUnlocked) {
+      playHtmlWav("unlock", 0.02);
+    }
 
     const ctx = ensureAudioCtx();
-    if (ctx) {
+    if (ctx && !state.speechUnlocked) {
       try {
         const buf = ctx.createBuffer(1, 1, 22050);
         const src = ctx.createBufferSource();
@@ -919,7 +924,9 @@
     if (!("speechSynthesis" in window)) return;
     populateVoices();
     try {
-      window.speechSynthesis.resume();
+      if (window.speechSynthesis.paused) {
+        window.speechSynthesis.resume();
+      }
       // Only fire a warm-up utterance if this button tap is NOT immediately calling speakText()
       if (!state.speechUnlocked && !willSpeakImmediately) {
         state.speechUnlocked = true;
@@ -938,12 +945,20 @@
     } catch (_) {}
   }
 
-  function playBoxingBell(strikes = 1) {
-    const key = strikes >= 3 ? "bell3" : strikes === 2 ? "bell2" : "bell1";
-    playHtmlWav(key, 1.0);
+  function isSpeechCurrentlyActive() {
+    return Boolean("speechSynthesis" in window && (window.speechSynthesis.speaking || window.speechSynthesis.pending));
+  }
 
+  function playBoxingBell(strikes = 1) {
     const ctx = ensureAudioCtx();
-    if (!ctx || ctx.state !== "running") return;
+    // Only use HTML5 <audio> fallback if Web Audio isn't running and speech isn't active
+    if (!ctx || ctx.state !== "running") {
+      if (!isSpeechCurrentlyActive()) {
+        const key = strikes >= 3 ? "bell3" : strikes === 2 ? "bell2" : "bell1";
+        playHtmlWav(key, 1.0);
+      }
+      if (!ctx) return;
+    }
     for (let s = 0; s < strikes; s++) {
       const startTime = ctx.currentTime + s * 0.28;
       const partials = [587.33, 1174.66, 1567.98, 2217.46, 2959.96];
@@ -953,7 +968,7 @@
         osc.type = idx % 2 === 0 ? "sine" : "triangle";
         osc.frequency.setValueAtTime(freq, startTime);
 
-        const peak = 0.22 / (idx + 1);
+        const peak = 0.26 / (idx + 1);
         gain.gain.setValueAtTime(0.0001, startTime);
         gain.gain.exponentialRampToValueAtTime(peak, startTime + 0.008);
         gain.gain.exponentialRampToValueAtTime(0.0001, startTime + 1.85 / (idx * 0.5 + 1));
@@ -967,7 +982,8 @@
   }
 
   function playStrikePadCue(side) {
-    playHtmlWav(side === "L" ? "padL" : "padR", 0.55);
+    // Never fire HTML5 <audio> or oscillators while speechSynthesis is actively voicing a combo on mobile
+    if (isSpeechCurrentlyActive()) return;
 
     const ctx = ensureAudioCtx();
     if (!ctx || ctx.state !== "running") return;
@@ -986,10 +1002,11 @@
   }
 
   function playClapperWarning() {
-    playHtmlWav("clapper", 0.95);
-
     const ctx = ensureAudioCtx();
-    if (!ctx || ctx.state !== "running") return;
+    if ((!ctx || ctx.state !== "running") && !isSpeechCurrentlyActive()) {
+      playHtmlWav("clapper", 0.95);
+    }
+    if (!ctx) return;
     [0, 0.16, 0.32].forEach((offset) => {
       const t = ctx.currentTime + offset;
       const osc = ctx.createOscillator();
@@ -998,7 +1015,7 @@
       osc.frequency.setValueAtTime(920, t);
       osc.frequency.exponentialRampToValueAtTime(240, t + 0.065);
 
-      gain.gain.setValueAtTime(0.24, t);
+      gain.gain.setValueAtTime(0.26, t);
       gain.gain.exponentialRampToValueAtTime(0.001, t + 0.07);
 
       osc.connect(gain);
@@ -1009,10 +1026,11 @@
   }
 
   function playCountdownPip() {
-    playHtmlWav("pip", 0.75);
-
     const ctx = ensureAudioCtx();
-    if (!ctx || ctx.state !== "running") return;
+    if ((!ctx || ctx.state !== "running") && !isSpeechCurrentlyActive()) {
+      playHtmlWav("pip", 0.75);
+    }
+    if (!ctx) return;
     const t = ctx.currentTime;
     const osc = ctx.createOscillator();
     const gain = ctx.createGain();
@@ -1062,13 +1080,11 @@
     window.speechSynthesis.onvoiceschanged = populateVoices;
   }
 
-  function speakText(text) {
+  function speakText(text, forceCancel = false) {
     if (!("speechSynthesis" in window) || !text) return;
-    configureMobileAudioSession();
 
     try {
-      // Only cancel if currently mid-speech; calling cancel() when idle on iOS/Android can drop the next utterance
-      if (window.speechSynthesis.speaking) {
+      if (forceCancel && window.speechSynthesis.speaking) {
         window.speechSynthesis.cancel();
       }
       if (window.speechSynthesis.paused) {
@@ -1295,7 +1311,8 @@
           void el.bagSwingWrapper.offsetWidth;
           el.bagSwingWrapper.classList.add(strike.side === "L" ? "swing-L" : "swing-R");
         }
-        if (shouldSpeak && el.comboEnabledToggle.checked) {
+        // Only play synthetic pad thud if voice callouts are turned OFF so audio never interrupts mobile speechSynthesis at 380ms
+        if (shouldSpeak && !el.comboEnabledToggle.checked) {
           playStrikePadCue(strike.side);
         }
         el.bagActiveCallout.textContent = `${idx + 1}/${chain.length}: ${strike.name} (${strike.side})`;
@@ -1323,10 +1340,13 @@
       minMs = 9000;
       maxMs = 12000;
     } else if (pace === "fast") {
-      minMs = 3600;
-      maxMs = 5200;
+      minMs = 4000;
+      maxMs = 5600;
     }
-    const delta = minMs + Math.random() * (maxMs - minMs);
+    // Automatically add breathing room for 5, 6, and 8-strike combinations so speech + execution never overlap
+    const len = state.currentCombo ? state.currentCombo.length : 4;
+    const extraLenMs = Math.max(0, (len - 4) * 900);
+    const delta = minMs + Math.random() * (maxMs - minMs) + extraLenMs;
     state.nextComboAtMs = performance.now() + delta;
   }
 
@@ -1396,8 +1416,9 @@
           const next = pickNextCombo();
           state.combosCalled++;
           renderAndAnimateCombo(next, true);
+          scheduleNextComboWindow();
         }
-      }, 1300);
+      }, 1500);
     } else if (newPhase === "rest") {
       state.roundEndBpm = state.currentBpm;
       state.phaseDurationMs = state.restSec * 1000;
@@ -1475,7 +1496,8 @@
       (state.phase === "work" || state.phase === "warning") &&
       el.comboEnabledToggle.checked &&
       now >= state.nextComboAtMs &&
-      state.remainingMs > 2800
+      state.remainingMs > 2800 &&
+      !isSpeechCurrentlyActive()
     ) {
       const combo = pickNextCombo();
       state.combosCalled++;
