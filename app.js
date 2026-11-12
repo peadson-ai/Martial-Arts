@@ -752,9 +752,132 @@
   }
 
   // ---------------------------------------------------------------------------
-  // 4. SYNTHESIZED WEB AUDIO + MOBILE / iOS SAFARI VOICE ENGINE
+  // 4. MOBILE-PROOF HTML5 WAV + WEB AUDIO + SYNCHRONOUS SPEECH ENGINE
+  // Pre-renders 16-bit PCM .wav buffers into native HTML5 <audio playsinline>
+  // elements so bells, clappers, pips, and pad cues play over the phone's Media
+  // channel (even when the iPhone hardware Ring/Silent switch is on!) and
+  // executes speechSynthesis.speak() synchronously inside user tap gestures.
   // ---------------------------------------------------------------------------
   let audioCtx = null;
+  window.__strikeUtterances = [];
+
+  function buildPcmWavDataUri(sampleRate, durationSec, sampleFn) {
+    const numSamples = Math.max(1, Math.floor(sampleRate * durationSec));
+    const buffer = new ArrayBuffer(44 + numSamples * 2);
+    const view = new DataView(buffer);
+
+    const writeStr = (offset, str) => {
+      for (let i = 0; i < str.length; i++) {
+        view.setUint8(offset + i, str.charCodeAt(i));
+      }
+    };
+
+    writeStr(0, "RIFF");
+    view.setUint32(4, 36 + numSamples * 2, true);
+    writeStr(8, "WAVE");
+    writeStr(12, "fmt ");
+    view.setUint32(16, 16, true); // PCM chunk size
+    view.setUint16(20, 1, true);  // PCM format
+    view.setUint16(22, 1, true);  // Mono
+    view.setUint32(24, sampleRate, true);
+    view.setUint32(28, sampleRate * 2, true);
+    view.setUint16(32, 2, true);
+    view.setUint16(34, 16, true); // 16-bit
+    writeStr(36, "data");
+    view.setUint32(40, numSamples * 2, true);
+
+    for (let i = 0; i < numSamples; i++) {
+      const t = i / sampleRate;
+      const raw = Math.max(-1, Math.min(1, sampleFn(t)));
+      view.setInt16(44 + i * 2, raw < 0 ? raw * 0x8000 : raw * 0x7fff, true);
+    }
+
+    const bytes = new Uint8Array(buffer);
+    let binary = "";
+    const chunk = 0x8000;
+    for (let i = 0; i < bytes.length; i += chunk) {
+      binary += String.fromCharCode.apply(null, bytes.subarray(i, i + chunk));
+    }
+    return "data:audio/wav;base64," + btoa(binary);
+  }
+
+  const SAMPLE_RATE = 22050;
+  const WAV_BANK = (() => {
+    const synthBell = (strikes) =>
+      buildPcmWavDataUri(SAMPLE_RATE, 1.45 + (strikes - 1) * 0.28, (t) => {
+        let sum = 0;
+        const partials = [587.33, 1174.66, 1567.98, 2217.46, 2959.96];
+        for (let s = 0; s < strikes; s++) {
+          const dt = t - s * 0.28;
+          if (dt >= 0) {
+            for (let idx = 0; idx < partials.length; idx++) {
+              const freq = partials[idx];
+              const env = Math.exp(-dt * (2.6 + idx * 1.15)) * (0.42 / (idx + 1));
+              sum += Math.sin(2 * Math.PI * freq * dt) * env;
+            }
+          }
+        }
+        return sum * 0.85;
+      });
+
+    const bell1 = synthBell(1);
+    const bell2 = synthBell(2);
+    const bell3 = synthBell(3);
+
+    const clapper = buildPcmWavDataUri(SAMPLE_RATE, 0.45, (t) => {
+      let sum = 0;
+      const offsets = [0, 0.15, 0.3];
+      for (let i = 0; i < offsets.length; i++) {
+        const dt = t - offsets[i];
+        if (dt >= 0 && dt <= 0.08) {
+          const freq = 900 * Math.exp(-dt * 18);
+          const env = Math.exp(-dt * 38);
+          sum += (Math.sin(2 * Math.PI * freq * dt) >= 0 ? 0.55 : -0.55) * env;
+        }
+      }
+      return sum;
+    });
+
+    const pip = buildPcmWavDataUri(SAMPLE_RATE, 0.11, (t) => {
+      const env = Math.exp(-t * 32);
+      return Math.sin(2 * Math.PI * 880 * t) * env * 0.45;
+    });
+
+    const padL = buildPcmWavDataUri(SAMPLE_RATE, 0.065, (t) => {
+      const freq = 480 * Math.exp(-t * 26);
+      const env = Math.exp(-t * 48);
+      return Math.sin(2 * Math.PI * freq * t) * env * 0.35;
+    });
+
+    const padR = buildPcmWavDataUri(SAMPLE_RATE, 0.065, (t) => {
+      const freq = 360 * Math.exp(-t * 26);
+      const env = Math.exp(-t * 48);
+      return Math.sin(2 * Math.PI * freq * t) * env * 0.35;
+    });
+
+    const unlock = buildPcmWavDataUri(SAMPLE_RATE, 0.04, (t) => Math.sin(2 * Math.PI * 440 * t) * 0.002);
+
+    return { bell1, bell2, bell3, clapper, pip, padL, padR, unlock };
+  })();
+
+  const htmlAudioPool = {};
+  function playHtmlWav(key, volume = 1.0) {
+    try {
+      const src = WAV_BANK[key];
+      if (!src) return;
+      let a = htmlAudioPool[key];
+      if (!a) {
+        a = new Audio(src);
+        a.setAttribute("playsinline", "true");
+        a.preload = "auto";
+        htmlAudioPool[key] = a;
+      }
+      a.volume = volume;
+      a.currentTime = 0;
+      const p = a.play();
+      if (p && typeof p.catch === "function") p.catch(() => {});
+    } catch (_) {}
+  }
 
   function configureMobileAudioSession() {
     try {
@@ -766,34 +889,61 @@
 
   function ensureAudioCtx() {
     configureMobileAudioSession();
-    if (!audioCtx) {
-      const AC = window.AudioContext || window.webkitAudioContext;
-      if (AC) audioCtx = new AC();
-    }
-    if (audioCtx && audioCtx.state === "suspended") {
-      audioCtx.resume();
-    }
+    try {
+      if (!audioCtx) {
+        const AC = window.AudioContext || window.webkitAudioContext;
+        if (AC) audioCtx = new AC();
+      }
+      if (audioCtx && audioCtx.state === "suspended") {
+        audioCtx.resume().catch(() => {});
+      }
+    } catch (_) {}
     return audioCtx;
   }
 
-  function unlockMobileSpeechAndAudio() {
-    ensureAudioCtx();
-    if (!("speechSynthesis" in window)) return;
-    populateVoices();
-    if (!state.speechUnlocked) {
-      state.speechUnlocked = true;
+  function unlockMobileSpeechAndAudio(willSpeakImmediately = false) {
+    configureMobileAudioSession();
+    playHtmlWav("unlock", 0.02);
+
+    const ctx = ensureAudioCtx();
+    if (ctx) {
       try {
-        window.speechSynthesis.resume();
-        const warm = new SpeechSynthesisUtterance("");
-        warm.volume = 0;
-        window.speechSynthesis.speak(warm);
+        const buf = ctx.createBuffer(1, 1, 22050);
+        const src = ctx.createBufferSource();
+        src.buffer = buf;
+        src.connect(ctx.destination);
+        src.start(0);
       } catch (_) {}
     }
+
+    if (!("speechSynthesis" in window)) return;
+    populateVoices();
+    try {
+      window.speechSynthesis.resume();
+      // Only fire a warm-up utterance if this button tap is NOT immediately calling speakText()
+      if (!state.speechUnlocked && !willSpeakImmediately) {
+        state.speechUnlocked = true;
+        const warm = new SpeechSynthesisUtterance("Ready");
+        warm.volume = 0.05;
+        warm.rate = 1.4;
+        window.__strikeUtterances.push(warm);
+        warm.onend = () => {
+          const i = window.__strikeUtterances.indexOf(warm);
+          if (i >= 0) window.__strikeUtterances.splice(i, 1);
+        };
+        window.speechSynthesis.speak(warm);
+      } else if (willSpeakImmediately) {
+        state.speechUnlocked = true;
+      }
+    } catch (_) {}
   }
 
   function playBoxingBell(strikes = 1) {
+    const key = strikes >= 3 ? "bell3" : strikes === 2 ? "bell2" : "bell1";
+    playHtmlWav(key, 1.0);
+
     const ctx = ensureAudioCtx();
-    if (!ctx) return;
+    if (!ctx || ctx.state !== "running") return;
     for (let s = 0; s < strikes; s++) {
       const startTime = ctx.currentTime + s * 0.28;
       const partials = [587.33, 1174.66, 1567.98, 2217.46, 2959.96];
@@ -803,7 +953,7 @@
         osc.type = idx % 2 === 0 ? "sine" : "triangle";
         osc.frequency.setValueAtTime(freq, startTime);
 
-        const peak = 0.28 / (idx + 1);
+        const peak = 0.22 / (idx + 1);
         gain.gain.setValueAtTime(0.0001, startTime);
         gain.gain.exponentialRampToValueAtTime(peak, startTime + 0.008);
         gain.gain.exponentialRampToValueAtTime(0.0001, startTime + 1.85 / (idx * 0.5 + 1));
@@ -817,8 +967,10 @@
   }
 
   function playStrikePadCue(side) {
+    playHtmlWav(side === "L" ? "padL" : "padR", 0.55);
+
     const ctx = ensureAudioCtx();
-    if (!ctx) return;
+    if (!ctx || ctx.state !== "running") return;
     const t = ctx.currentTime;
     const osc = ctx.createOscillator();
     const gain = ctx.createGain();
@@ -834,8 +986,10 @@
   }
 
   function playClapperWarning() {
+    playHtmlWav("clapper", 0.95);
+
     const ctx = ensureAudioCtx();
-    if (!ctx) return;
+    if (!ctx || ctx.state !== "running") return;
     [0, 0.16, 0.32].forEach((offset) => {
       const t = ctx.currentTime + offset;
       const osc = ctx.createOscillator();
@@ -844,7 +998,7 @@
       osc.frequency.setValueAtTime(920, t);
       osc.frequency.exponentialRampToValueAtTime(240, t + 0.065);
 
-      gain.gain.setValueAtTime(0.28, t);
+      gain.gain.setValueAtTime(0.24, t);
       gain.gain.exponentialRampToValueAtTime(0.001, t + 0.07);
 
       osc.connect(gain);
@@ -855,8 +1009,10 @@
   }
 
   function playCountdownPip() {
+    playHtmlWav("pip", 0.75);
+
     const ctx = ensureAudioCtx();
-    if (!ctx) return;
+    if (!ctx || ctx.state !== "running") return;
     const t = ctx.currentTime;
     const osc = ctx.createOscillator();
     const gain = ctx.createGain();
@@ -911,31 +1067,41 @@
     configureMobileAudioSession();
 
     try {
-      if (window.speechSynthesis.speaking || window.speechSynthesis.pending) {
+      // Only cancel if currently mid-speech; calling cancel() when idle on iOS/Android can drop the next utterance
+      if (window.speechSynthesis.speaking) {
         window.speechSynthesis.cancel();
       }
-      window.speechSynthesis.resume();
+      if (window.speechSynthesis.paused) {
+        window.speechSynthesis.resume();
+      }
 
-      const speakNow = () => {
-        const utter = new SpeechSynthesisUtterance(text);
-        utter.lang = "en-US";
-        const selectedURI = el.voiceSelect.value;
-        if (selectedURI && state.voices.length > 0) {
-          const chosen = state.voices.find((v) => v.voiceURI === selectedURI || v.name === selectedURI);
-          if (chosen) {
-            utter.voice = chosen;
-            if (chosen.lang) utter.lang = chosen.lang;
-          }
+      const utter = new SpeechSynthesisUtterance(text);
+      utter.lang = "en-US";
+
+      const selectedURI = el.voiceSelect ? el.voiceSelect.value : "";
+      if (selectedURI && state.voices.length > 0) {
+        const chosen = state.voices.find((v) => v.voiceURI === selectedURI || v.name === selectedURI);
+        if (chosen) {
+          utter.voice = chosen;
+          if (chosen.lang) utter.lang = chosen.lang;
         }
+      }
 
-        utter.rate = Math.max(0.7, Math.min(1.8, parseFloat(el.voiceRateInput.value) || 1.1));
-        utter.pitch = Math.max(0.5, Math.min(1.5, parseFloat(el.voicePitchInput.value) || 0.95));
-        utter.volume = 1.0;
+      utter.rate = Math.max(0.7, Math.min(1.8, parseFloat(el.voiceRateInput.value) || 1.1));
+      utter.pitch = Math.max(0.5, Math.min(1.5, parseFloat(el.voicePitchInput.value) || 0.95));
+      utter.volume = 1.0;
 
-        window.speechSynthesis.speak(utter);
+      // Retain reference in global array so Mobile Safari / Android Chrome GC never collects it mid-speech
+      window.__strikeUtterances.push(utter);
+      const cleanup = () => {
+        const idx = window.__strikeUtterances.indexOf(utter);
+        if (idx >= 0) window.__strikeUtterances.splice(idx, 1);
       };
+      utter.onend = cleanup;
+      utter.onerror = cleanup;
 
-      setTimeout(speakNow, 35);
+      // MUST execute synchronously (no setTimeout) so mobile browsers preserve the transient user activation!
+      window.speechSynthesis.speak(utter);
     } catch (_) {}
   }
 
@@ -1339,7 +1505,6 @@
   }
 
   function toggleStartPause() {
-    unlockMobileSpeechAndAudio();
     requestScreenWakeLock();
     if (!state.isRunning) {
       if (state.phase === "idle" || state.phase === "done") {
@@ -1349,10 +1514,14 @@
         state.totalWorkElapsedMs = 0;
         state.totalCaloriesKcal = 0;
         if (state.prepSec > 0) {
+          unlockMobileSpeechAndAudio(true);
           enterPhase("prep");
         } else {
+          unlockMobileSpeechAndAudio(false);
           enterPhase("work");
         }
+      } else {
+        unlockMobileSpeechAndAudio(false);
       }
       state.isRunning = true;
       state.lastTickTs = performance.now();
@@ -1509,7 +1678,7 @@
   }
 
   el.triggerComboBtn.addEventListener("click", () => {
-    unlockMobileSpeechAndAudio();
+    unlockMobileSpeechAndAudio(true);
     const combo = pickNextCombo();
     state.combosCalled++;
     renderAndAnimateCombo(combo, true);
@@ -1517,17 +1686,17 @@
   });
 
   el.prevComboBtn.addEventListener("click", () => {
-    unlockMobileSpeechAndAudio();
+    unlockMobileSpeechAndAudio(true);
     renderAndAnimateCombo(state.currentCombo, true);
   });
 
   el.soundBellTestBtn.addEventListener("click", () => {
-    unlockMobileSpeechAndAudio();
+    unlockMobileSpeechAndAudio(false);
     playBoxingBell(1);
   });
 
   el.testVoiceBtn.addEventListener("click", () => {
-    unlockMobileSpeechAndAudio();
+    unlockMobileSpeechAndAudio(true);
     speakText(formatSpokenComboText(state.currentCombo));
   });
 
@@ -1597,7 +1766,7 @@
 
   document.querySelectorAll(".persona-pill").forEach((pill) => {
     pill.addEventListener("click", () => {
-      unlockMobileSpeechAndAudio();
+      unlockMobileSpeechAndAudio(true);
       const p = VOICE_PERSONAS[pill.dataset.persona];
       if (!p) return;
       document.querySelectorAll(".persona-pill").forEach((b) => b.classList.remove("active"));
@@ -1619,13 +1788,13 @@
   });
 
   el.voiceSelect.addEventListener("change", () => {
-    unlockMobileSpeechAndAudio();
+    unlockMobileSpeechAndAudio(true);
     state.selectedVoiceURI = el.voiceSelect.value;
     speakText(formatSpokenComboText(state.currentCombo));
   });
 
   el.addComboBtn.addEventListener("click", () => {
-    unlockMobileSpeechAndAudio();
+    unlockMobileSpeechAndAudio(true);
     const val = el.customComboInput.value.trim();
     if (!val) return;
     state.customCombos.unshift(val);
