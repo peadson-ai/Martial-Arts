@@ -11,7 +11,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:ital,wght@0,600;0,700;0,800;0,900;1,800&family=JetBrains+Mono:wght@500;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="styles.css" />
+  <link rel="stylesheet" href="styles.css?v=20261112b" />
 </head>
 <body data-phase="idle" data-discipline="dutch-mma" data-mobile-tab="workout">
   <!-- Ambient Arena Lighting Backdrop -->
@@ -285,14 +285,17 @@
           <div class="polar-right">
             <canvas id="hr-sparkline" width="110" height="36" aria-label="Live Heart Rate Trend"></canvas>
             <div class="polar-Quick-actions">
-              <div class="hrr-metric" title="Active Calorie Burn & Rate (Polar HR / METs)">
+              <div class="hrr-metric" title="Active Calorie Burn Rate (Polar HR / METs)">
                 <span class="sub-lbl">BURN RATE</span>
                 <span id="stat-kcal-rate" class="sub-val kcal-highlight">0.0 kcal/m</span>
               </div>
-              <div class="hrr-metric" title="Heart Rate Recovery Drop during Rest">
-                <span class="sub-lbl">RECOVERY</span>
-                <span id="stat-hrr" class="sub-val">-- BPM</span>
+              <div class="hrr-metric" title="Peak Heart Rate & Recovery Drop">
+                <span class="sub-lbl">PEAK / REC</span>
+                <span class="sub-val"><span id="stat-peak-hr">--</span> / <span id="stat-hrr">--</span></span>
               </div>
+              <button id="polar-scan-all-btn" class="action-chip" type="button" title="Fallback Bluetooth Scanner (Lists all nearby BLE devices if Polar is hidden)">
+                Scan All BLE
+              </button>
               <button id="polar-sim-btn" class="action-chip" type="button" title="Simulate Polar H10 Live Stream">
                 Sim HR
               </button>
@@ -556,6 +559,6 @@
     </nav>
   </div>
 
-  <script src="app.js"></script>
+  <script src="app.js?v=20261112b"></script>
 </body>
 </html>

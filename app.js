@@ -389,6 +389,7 @@
     timeDisplay: document.getElementById("time-display"),
     statCombos: document.getElementById("stat-combos"),
     statCalories: document.getElementById("stat-calories"),
+    statPeakHr: document.getElementById("stat-peak-hr"),
     statWorkTime: document.getElementById("stat-work-time"),
     bagSwingWrapper: document.getElementById("bag-swing-wrapper"),
     bagActiveCallout: document.getElementById("bag-active-callout"),
@@ -418,6 +419,7 @@
     hrSparkline: document.getElementById("hr-sparkline"),
     statKcalRate: document.getElementById("stat-kcal-rate"),
     statHrr: document.getElementById("stat-hrr"),
+    polarScanAllBtn: document.getElementById("polar-scan-all-btn"),
     polarSimBtn: document.getElementById("polar-sim-btn"),
 
     roundsInput: document.getElementById("rounds-input"),
@@ -524,28 +526,35 @@
     if (state.phase === "rest" && state.roundEndBpm > 0) {
       const drop = Math.max(0, state.roundEndBpm - bpm);
       state.lastRecoveryDrop = drop;
-      el.statHrr.textContent = `-${drop} BPM`;
+      if (el.statHrr) el.statHrr.textContent = `-${drop} BPM`;
     }
 
     state.bpmHistory.push(bpm);
     if (state.bpmHistory.length > 45) state.bpmHistory.shift();
 
     const zInfo = computeHrZone(bpm, state.maxHr);
-    el.bpmValue.textContent = String(bpm);
-    el.hrPctMax.textContent = `${zInfo.pct}%`;
-    el.polarZonePill.textContent = zInfo.name;
-    el.polarZonePill.style.borderColor = zInfo.color;
-    el.polarZonePill.style.color = zInfo.color;
+    if (el.bpmValue) el.bpmValue.textContent = String(bpm);
+    if (el.hrPctMax) el.hrPctMax.textContent = `${zInfo.pct}%`;
+    if (el.statPeakHr) el.statPeakHr.textContent = String(state.peakBpm);
+    if (el.polarZonePill) {
+      el.polarZonePill.textContent = zInfo.name;
+      el.polarZonePill.style.borderColor = zInfo.color;
+      el.polarZonePill.style.color = zInfo.color;
+    }
 
-    if (sourceLabel) {
+    if (sourceLabel && el.polarStatusText) {
       el.polarStatusText.textContent = sourceLabel;
     }
 
     const beatSec = Math.max(0.3, Math.min(1.4, 60 / bpm));
-    el.bpmHeartAnim.style.setProperty("--beat-dur", `${beatSec.toFixed(2)}s`);
+    if (el.bpmHeartAnim) {
+      el.bpmHeartAnim.style.setProperty("--beat-dur", `${beatSec.toFixed(2)}s`);
+    }
 
     const markerPct = Math.max(2, Math.min(98, ((zInfo.pct - 50) / 50) * 100));
-    el.hrZoneMarker.style.left = `${markerPct}%`;
+    if (el.hrZoneMarker) {
+      el.hrZoneMarker.style.left = `${markerPct}%`;
+    }
 
     state.currentKcalPerMin = calculateBurnRateKcalPerMin();
     if (el.statKcalRate) {
@@ -555,48 +564,146 @@
     drawHrSparkline();
   }
 
-  async function connectPolarBluetooth() {
+  async function connectPolarGatt(device) {
+    stopPolarSimulation();
+    state.polarDevice = device;
+
+    if (!device.__strikeDisconnectBound) {
+      device.__strikeDisconnectBound = true;
+      device.addEventListener("gattserverdisconnected", () => {
+        state.polarConnected = false;
+        if (el.polarConnectBtn) el.polarConnectBtn.classList.remove("connected");
+        if (el.polarBtnLabel) el.polarBtnLabel.textContent = "RECONNECT POLAR";
+        if (el.polarStatusText) {
+          el.polarStatusText.textContent = `${device.name || "POLAR"} DISCONNECTED • TAP POLAR HR TO RECONNECT`;
+        }
+      });
+    }
+
+    if (el.polarStatusText) {
+      el.polarStatusText.textContent = `CONNECTING TO ${device.name || "POLAR BLE"}...`;
+    }
+
+    // Connect with retry in case the strap is waking from sleep or releasing a prior handle
+    let server = null;
+    let lastErr = null;
+    for (let attempt = 1; attempt <= 2; attempt++) {
+      try {
+        server = device.gatt.connected ? device.gatt : await device.gatt.connect();
+        break;
+      } catch (e) {
+        lastErr = e;
+        await new Promise((r) => setTimeout(r, 350));
+      }
+    }
+    if (!server) throw lastErr || new Error("GATT connect failed");
+
+    let service = null;
+    try {
+      service = await server.getPrimaryService("heart_rate");
+    } catch (_) {
+      service = await server.getPrimaryService(0x180d);
+    }
+
+    let char = null;
+    try {
+      char = await service.getCharacteristic("heart_rate_measurement");
+    } catch (_) {
+      char = await service.getCharacteristic(0x2a37);
+    }
+
+    await char.startNotifications();
+    char.addEventListener("characteristicvaluechanged", (ev) => {
+      const bpm = parseHeartRateMeasurement(ev.target.value);
+      ingestHeartRateSample(bpm, `${device.name || "POLAR H10"} • LIVE BLE`);
+    });
+
+    state.polarConnected = true;
+    if (el.polarConnectBtn) el.polarConnectBtn.classList.add("connected");
+    if (el.polarBtnLabel) el.polarBtnLabel.textContent = `${device.name || "POLAR"} LIVE`;
+    if (el.polarStatusText) el.polarStatusText.textContent = `${device.name || "POLAR BLE"} • CONNECTED`;
+  }
+
+  async function connectPolarBluetooth(forceAcceptAll = false) {
+    const useAcceptAll = forceAcceptAll === true;
+
     if (!navigator.bluetooth) {
+      if (el.polarStatusText) {
+        el.polarStatusText.textContent = "WEB BLUETOOTH REQUIRES CHROME/EDGE (OR BLUEFY ON IPHONE)";
+      }
       alert(
-        "Web Bluetooth requires Chrome/Edge on PC or Android, or the Bluefy WebBLE browser on iPhone. Tap 'Sim HR' to test live Polar BPM & Calorie burn now!"
+        "Web Bluetooth is not enabled in this browser.\n\n• On Windows / Android: Use Chrome, Edge, or StrikeOS-Desktop.exe\n• On iPhone / iPad: Apple disables Web Bluetooth in Safari — open this page in the free 'Bluefy' WebBLE browser app\n• Or tap 'Sim HR' to test live BPM & Calorie tracking right now."
       );
       return;
     }
 
     try {
-      el.polarStatusText.textContent = "SCANNING FOR POLAR BLE...";
-      const device = await navigator.bluetooth.requestDevice({
-        filters: [{ services: ["heart_rate"] }, { namePrefix: "Polar" }],
-        optionalServices: ["heart_rate", "battery_service"]
-      });
+      // If we already have a selected Polar device that dropped connection, try reconnecting first unless user clicked Scan All
+      if (!useAcceptAll && state.polarDevice && !state.polarConnected) {
+        try {
+          await connectPolarGatt(state.polarDevice);
+          return;
+        } catch (_) {
+          // Fall through to device chooser if direct reconnect failed
+        }
+      }
 
-      stopPolarSimulation();
-      state.polarDevice = device;
-      device.addEventListener("gattserverdisconnected", () => {
-        state.polarConnected = false;
-        el.polarConnectBtn.classList.remove("connected");
-        el.polarBtnLabel.textContent = "POLAR HR";
-        el.polarStatusText.textContent = `${device.name || "POLAR"} DISCONNECTED`;
-      });
+      // If currently connected, disconnect cleanly before opening a new scan
+      if (state.polarDevice && state.polarDevice.gatt && state.polarDevice.gatt.connected) {
+        try {
+          state.polarDevice.gatt.disconnect();
+        } catch (_) {}
+      }
 
-      const server = await device.gatt.connect();
-      const service = await server.getPrimaryService("heart_rate");
-      const char = await service.getCharacteristic("heart_rate_measurement");
-      await char.startNotifications();
+      if (el.polarStatusText) {
+        el.polarStatusText.textContent = useAcceptAll
+          ? "SCANNING ALL NEARBY BLUETOOTH DEVICES..."
+          : "SCANNING FOR POLAR / HEART RATE BLE...";
+      }
 
-      char.addEventListener("characteristicvaluechanged", (ev) => {
-        const bpm = parseHeartRateMeasurement(ev.target.value);
-        ingestHeartRateSample(bpm, `${device.name || "POLAR H10"} • LIVE BLE`);
-      });
+      const requestOptions = useAcceptAll
+        ? {
+            acceptAllDevices: true,
+            optionalServices: ["heart_rate", 0x180d, "battery_service", 0x180f]
+          }
+        : {
+            filters: [
+              { services: ["heart_rate"] },
+              { services: [0x180d] },
+              { namePrefix: "Polar" },
+              { namePrefix: "H10" },
+              { namePrefix: "H9" },
+              { namePrefix: "H7" },
+              { namePrefix: "Verity" },
+              { namePrefix: "OH1" }
+            ],
+            optionalServices: ["heart_rate", 0x180d, "battery_service", 0x180f]
+          };
 
-      state.polarConnected = true;
-      el.polarConnectBtn.classList.add("connected");
-      el.polarBtnLabel.textContent = `${device.name || "POLAR"} LIVE`;
-      el.polarStatusText.textContent = `${device.name || "POLAR BLE"} • CONNECTED`;
+      const device = await navigator.bluetooth.requestDevice(requestOptions);
+      await connectPolarGatt(device);
     } catch (err) {
-      el.polarStatusText.textContent = "POLAR BLE: STANDBY (TAP SIM HR TO PREVIEW)";
+      const msg = (err && err.message) ? err.message : String(err || "");
+      if (msg.toLowerCase().includes("cancel") || (err && err.name === "NotFoundError")) {
+        if (el.polarStatusText) {
+          el.polarStatusText.textContent = "SCAN CANCELLED • TRY 'SCAN ALL BLE' IF STRAP IS HIDDEN";
+        }
+      } else {
+        if (el.polarStatusText) {
+          el.polarStatusText.textContent = `BLE ERROR: ${msg.slice(0, 48).toUpperCase()}`;
+        }
+      }
     }
   }
+
+  // Ensure BLE GATT handle is cleanly released if page refreshes or closes so the Polar strap keeps advertising
+  window.addEventListener("pagehide", () => {
+    try {
+      if (state.polarDevice && state.polarDevice.gatt && state.polarDevice.gatt.connected) {
+        state.polarDevice.gatt.disconnect();
+      }
+    } catch (_) {}
+  });
 
   function stopPolarSimulation() {
     state.polarSimulated = false;
@@ -683,9 +790,6 @@
       } catch (_) {}
     }
   }
-
-  window.addEventListener("touchstart", unlockMobileSpeechAndAudio, { once: true, passive: true });
-  window.addEventListener("click", unlockMobileSpeechAndAudio, { once: true });
 
   function playBoxingBell(strikes = 1) {
     const ctx = ensureAudioCtx();
@@ -1086,11 +1190,14 @@
 
   function updateDisplay() {
     const secLeft = state.remainingMs / 1000;
-    el.timeDisplay.textContent = formatMMSS(secLeft);
-    el.roundCounter.innerHTML = `${String(state.currentRound).padStart(2, "0")} <small>/ ${String(state.totalRounds).padStart(2, "0")}</small>`;
-    el.statCombos.textContent = String(state.combosCalled);
-    el.statCalories.textContent = String(Math.round(state.totalCaloriesKcal));
-    el.statWorkTime.textContent = formatMMSS(state.totalWorkElapsedMs / 1000);
+    if (el.timeDisplay) el.timeDisplay.textContent = formatMMSS(secLeft);
+    if (el.roundCounter) {
+      el.roundCounter.innerHTML = `${String(state.currentRound).padStart(2, "0")} <small>/ ${String(state.totalRounds).padStart(2, "0")}</small>`;
+    }
+    if (el.statCombos) el.statCombos.textContent = String(state.combosCalled);
+    if (el.statCalories) el.statCalories.textContent = String(Math.round(state.totalCaloriesKcal));
+    if (el.statPeakHr && state.peakBpm > 0) el.statPeakHr.textContent = String(state.peakBpm);
+    if (el.statWorkTime) el.statWorkTime.textContent = formatMMSS(state.totalWorkElapsedMs / 1000);
 
     if (el.statKcalRate) {
       el.statKcalRate.textContent = `${state.currentKcalPerMin.toFixed(1)} kcal/m`;
@@ -1100,7 +1207,7 @@
       ? Math.max(0, Math.min(1, state.remainingMs / state.phaseDurationMs))
       : 1;
     const offset = CIRCUMFERENCE * (1 - fraction);
-    el.dialProgress.style.strokeDashoffset = String(offset);
+    if (el.dialProgress) el.dialProgress.style.strokeDashoffset = String(offset);
   }
 
   function enterPhase(newPhase) {
@@ -1391,8 +1498,15 @@
     if (state.isRunning) advanceToNextPhase();
   });
 
-  el.polarConnectBtn.addEventListener("click", connectPolarBluetooth);
-  el.polarSimBtn.addEventListener("click", togglePolarSimulation);
+  if (el.polarConnectBtn) {
+    el.polarConnectBtn.addEventListener("click", () => connectPolarBluetooth(false));
+  }
+  if (el.polarScanAllBtn) {
+    el.polarScanAllBtn.addEventListener("click", () => connectPolarBluetooth(true));
+  }
+  if (el.polarSimBtn) {
+    el.polarSimBtn.addEventListener("click", togglePolarSimulation);
+  }
 
   el.triggerComboBtn.addEventListener("click", () => {
     unlockMobileSpeechAndAudio();
