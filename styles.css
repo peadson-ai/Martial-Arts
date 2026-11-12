@@ -1,6 +1,6 @@
 :root {
   --bg-obsidian: #07090e;
-  --surface-1: rgba(14, 19, 29, 0.86);
+  --surface-1: rgba(14, 19, 29, 0.88);
   --surface-2: rgba(21, 28, 42, 0.92);
   --surface-3: rgba(30, 41, 59, 0.65);
   --border-subtle: rgba(255, 255, 255, 0.08);
@@ -41,13 +41,22 @@ body[data-phase="rest"] { --phase-active: var(--phase-rest); }
   padding: 0;
 }
 
-html, body {
-  min-height: 100vh;
+html {
+  height: auto;
+  min-height: 100%;
+  background-color: var(--bg-obsidian);
+  -webkit-text-size-adjust: 100%;
+}
+
+body {
+  min-height: 100dvh;
   background-color: var(--bg-obsidian);
   color: var(--text-primary);
   font-family: var(--font-sans);
   -webkit-font-smoothing: antialiased;
-  overflow-x: hidden;
+  -webkit-overflow-scrolling: touch;
+  overflow-x: clip;
+  overflow-y: auto;
 }
 
 /* Ambient Arena Lighting Backdrop */
@@ -110,10 +119,10 @@ body[data-phase="warning"] .glow-primary {
   z-index: 1;
   max-width: 1420px;
   margin: 0 auto;
-  padding: 1rem 1.4rem 1.8rem;
+  padding: 0.9rem 1.25rem 2rem;
   display: flex;
   flex-direction: column;
-  gap: 1.1rem;
+  gap: 1rem;
 }
 
 /* Top Navigation Bar */
@@ -122,46 +131,55 @@ body[data-phase="warning"] .glow-primary {
   flex-wrap: wrap;
   align-items: center;
   justify-content: space-between;
-  gap: 1rem;
+  gap: 0.75rem;
   background: var(--surface-1);
   backdrop-filter: blur(16px);
   border: 1px solid var(--border-subtle);
   border-top: 1px solid var(--border-highlight);
   border-radius: 16px;
-  padding: 0.75rem 1.2rem;
-  box-shadow: 0 14px 32px rgba(0, 0, 0, 0.45);
+  padding: 0.7rem 1.1rem;
+  box-shadow: 0 12px 28px rgba(0, 0, 0, 0.45);
+}
+
+.brand-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  flex: 1;
 }
 
 .brand-lockup {
   display: flex;
   align-items: center;
-  gap: 0.85rem;
+  gap: 0.7rem;
 }
 
 .brand-emblem {
-  width: 42px;
-  height: 42px;
-  border-radius: 11px;
+  width: 38px;
+  height: 38px;
+  border-radius: 10px;
   background: linear-gradient(135deg, rgba(249, 115, 22, 0.24), rgba(6, 182, 212, 0.24));
   border: 1px solid rgba(249, 115, 22, 0.55);
   color: var(--rear-orange);
   display: grid;
   place-items: center;
-  padding: 6px;
-  box-shadow: 0 0 20px rgba(249, 115, 22, 0.25);
+  padding: 5px;
+  box-shadow: 0 0 18px rgba(249, 115, 22, 0.25);
+  flex-shrink: 0;
 }
 
 .brand-kicker {
   font-family: var(--font-mono);
-  font-size: 0.65rem;
+  font-size: 0.6rem;
   font-weight: 700;
-  letter-spacing: 0.12em;
+  letter-spacing: 0.1em;
   color: var(--lead-cyan);
 }
 
 .brand-name {
   font-family: var(--font-display);
-  font-size: 1.65rem;
+  font-size: 1.55rem;
   font-weight: 900;
   letter-spacing: 0.04em;
   line-height: 1;
@@ -175,26 +193,32 @@ body[data-phase="warning"] .glow-primary {
 /* Mode Switcher (Discipline Tabs) */
 .mode-switcher {
   display: flex;
-  flex-wrap: wrap;
   gap: 0.35rem;
   background: rgba(7, 9, 14, 0.78);
-  padding: 0.3rem;
+  padding: 0.28rem;
   border-radius: 12px;
   border: 1px solid var(--border-subtle);
+  overflow-x: auto;
+  max-width: 100%;
+  scrollbar-width: none;
+}
+.mode-switcher::-webkit-scrollbar {
+  display: none;
 }
 
 .mode-pill {
   display: inline-flex;
   align-items: center;
-  gap: 0.45rem;
+  gap: 0.4rem;
   background: transparent;
   color: var(--text-secondary);
   border: none;
-  padding: 0.48rem 0.9rem;
+  padding: 0.44rem 0.8rem;
   border-radius: 9px;
   font-family: var(--font-sans);
-  font-size: 0.8rem;
+  font-size: 0.78rem;
   font-weight: 700;
+  white-space: nowrap;
   cursor: pointer;
   transition: all 0.18s ease;
 }
@@ -227,31 +251,26 @@ body[data-phase="warning"] .glow-primary {
 .nav-utilities {
   display: flex;
   align-items: center;
-  gap: 0.55rem;
+  gap: 0.45rem;
 }
 
 .polar-btn {
   display: inline-flex;
   align-items: center;
-  gap: 0.45rem;
+  gap: 0.4rem;
   background: linear-gradient(135deg, rgba(225, 29, 72, 0.22), rgba(159, 18, 57, 0.28));
   color: #fda4af;
   border: 1px solid rgba(244, 63, 94, 0.5);
-  padding: 0.42rem 0.85rem;
+  padding: 0.4rem 0.75rem;
   border-radius: 9px;
   font-family: var(--font-mono);
-  font-size: 0.72rem;
+  font-size: 0.7rem;
   font-weight: 800;
-  letter-spacing: 0.05em;
+  letter-spacing: 0.04em;
+  white-space: nowrap;
   cursor: pointer;
   transition: all 0.18s ease;
-  box-shadow: 0 0 18px rgba(244, 63, 94, 0.18);
-}
-
-.polar-btn:hover {
-  background: linear-gradient(135deg, rgba(225, 29, 72, 0.36), rgba(159, 18, 57, 0.42));
-  color: #fff;
-  border-color: #fb7185;
+  box-shadow: 0 0 16px rgba(244, 63, 94, 0.18);
 }
 
 .polar-btn.connected {
@@ -263,7 +282,7 @@ body[data-phase="warning"] .glow-primary {
 
 .heart-icon {
   color: #f43f5e;
-  font-size: 0.9rem;
+  font-size: 0.88rem;
   display: inline-block;
   animation: heartBeat 1s infinite ease-in-out;
 }
@@ -274,205 +293,34 @@ body[data-phase="warning"] .glow-primary {
   45% { transform: scale(0.95); }
 }
 
-/* Polar Biometrics Telemetry Strip */
-.polar-telemetry-strip {
-  background: linear-gradient(180deg, rgba(15, 21, 33, 0.92), rgba(9, 13, 21, 0.96));
-  border: 1px solid var(--border-highlight);
-  border-radius: 15px;
-  padding: 0.78rem 1.1rem;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  flex-wrap: wrap;
-  gap: 0.9rem;
-}
-
-.polar-left {
-  display: flex;
-  align-items: center;
-  gap: 1rem;
-  flex: 1;
-  min-width: 260px;
-}
-
-.bpm-readout-box {
-  display: flex;
-  align-items: center;
-  gap: 0.45rem;
-  background: rgba(244, 63, 94, 0.1);
-  border: 1px solid rgba(244, 63, 94, 0.32);
-  padding: 0.38rem 0.75rem;
-  border-radius: 11px;
-}
-
-.bpm-heart {
-  color: #f43f5e;
-  font-size: 1.35rem;
-  animation: heartBeat var(--beat-dur, 0.85s) infinite ease-in-out;
-}
-
-.bpm-numerals {
-  font-family: var(--font-display);
-  font-size: 2.25rem;
-  font-weight: 900;
-  line-height: 0.9;
-  color: #fff;
-  font-variant-numeric: tabular-nums;
-  min-width: 48px;
-  text-align: center;
-}
-
-.bpm-unit-stack {
-  display: flex;
-  flex-direction: column;
-}
-
-.bpm-unit {
-  font-family: var(--font-mono);
-  font-size: 0.65rem;
-  font-weight: 800;
-  color: #fb7185;
-}
-
-.bpm-pct {
-  font-family: var(--font-mono);
-  font-size: 0.6rem;
-  color: var(--text-secondary);
-}
-
-.polar-meta {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  gap: 0.38rem;
-}
-
-.polar-device-row {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  gap: 0.5rem;
-}
-
-.polar-device-name {
-  font-family: var(--font-mono);
-  font-size: 0.68rem;
-  font-weight: 800;
-  letter-spacing: 0.08em;
-  color: var(--text-secondary);
-}
-
-.hr-zone-pill {
-  font-family: var(--font-mono);
-  font-size: 0.64rem;
-  font-weight: 800;
-  padding: 0.14rem 0.5rem;
-  border-radius: 5px;
-  background: rgba(255, 255, 255, 0.07);
-  color: #fff;
-}
-
-.hr-zone-bar {
-  position: relative;
-  display: grid;
-  grid-template-columns: repeat(5, 1fr);
-  gap: 3px;
-  height: 14px;
-  border-radius: 6px;
-  overflow: visible;
-}
-
-.hr-zone-seg {
-  border-radius: 4px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-family: var(--font-mono);
-  font-size: 0.55rem;
-  font-weight: 800;
-  color: rgba(255, 255, 255, 0.85);
-}
-
-.hr-zone-seg.z1 { background: rgba(56, 189, 248, 0.45); }
-.hr-zone-seg.z2 { background: rgba(16, 185, 129, 0.55); }
-.hr-zone-seg.z3 { background: rgba(245, 158, 11, 0.65); }
-.hr-zone-seg.z4 { background: rgba(249, 115, 22, 0.75); }
-.hr-zone-seg.z5 { background: rgba(225, 29, 72, 0.85); }
-
-.hr-zone-marker {
-  position: absolute;
-  top: -3px;
-  bottom: -3px;
-  width: 4px;
-  background: #fff;
-  border-radius: 2px;
-  box-shadow: 0 0 8px #fff;
-  transition: left 0.3s ease;
-}
-
-.polar-right {
-  display: flex;
-  align-items: center;
-  gap: 0.75rem;
-}
-
-#hr-sparkline {
-  background: rgba(7, 10, 16, 0.75);
-  border: 1px solid var(--border-subtle);
-  border-radius: 8px;
-}
-
-.polar-Quick-actions {
-  display: flex;
-  align-items: center;
-  gap: 0.55rem;
-}
-
-.hrr-metric {
-  display: flex;
-  flex-direction: column;
-  align-items: flex-end;
-}
-
 .utility-btn {
   background: rgba(255, 255, 255, 0.06);
   color: var(--text-primary);
   border: 1px solid var(--border-highlight);
-  padding: 0.42rem 0.78rem;
+  padding: 0.4rem 0.68rem;
   border-radius: 8px;
   font-family: var(--font-mono);
-  font-size: 0.7rem;
+  font-size: 0.75rem;
   font-weight: 800;
   cursor: pointer;
-  transition: all 0.15s ease;
-}
-
-.utility-btn:hover {
-  background: rgba(255, 255, 255, 0.14);
 }
 
 /* Preset Strip inside Interval Card */
 .preset-strip {
   display: grid;
   grid-template-columns: repeat(5, 1fr);
-  gap: 0.4rem;
-  margin-bottom: 0.85rem;
-}
-
-@media (max-width: 640px) {
-  .preset-strip {
-    grid-template-columns: repeat(2, 1fr);
-  }
+  gap: 0.38rem;
+  margin-bottom: 0.8rem;
 }
 
 .preset-chip {
   background: rgba(255, 255, 255, 0.04);
   color: var(--text-secondary);
   border: 1px solid var(--border-subtle);
-  padding: 0.45rem 0.4rem;
+  padding: 0.44rem 0.35rem;
   border-radius: 8px;
   font-family: var(--font-mono);
-  font-size: 0.7rem;
+  font-size: 0.68rem;
   font-weight: 700;
   text-align: center;
   cursor: pointer;
@@ -484,21 +332,14 @@ body[data-phase="warning"] .glow-primary {
   background: rgba(16, 185, 129, 0.16);
   color: #fff;
   border-color: var(--phase-work);
-  box-shadow: 0 0 12px rgba(16, 185, 129, 0.2);
 }
 
 /* Main Command Deck Grid */
 .command-deck {
   display: grid;
   grid-template-columns: 1.38fr 1fr;
-  gap: 1.25rem;
+  gap: 1.15rem;
   align-items: start;
-}
-
-@media (max-width: 1080px) {
-  .command-deck {
-    grid-template-columns: 1fr;
-  }
 }
 
 /* LEFT: Chrono Stage */
@@ -507,12 +348,12 @@ body[data-phase="warning"] .glow-primary {
   backdrop-filter: blur(20px);
   border: 1px solid var(--border-subtle);
   border-top: 1px solid var(--border-highlight);
-  border-radius: 22px;
-  padding: 1.35rem 1.5rem;
+  border-radius: 20px;
+  padding: 1.2rem 1.35rem;
   display: flex;
   flex-direction: column;
-  gap: 1.2rem;
-  box-shadow: 0 24px 54px rgba(0, 0, 0, 0.5), 0 0 0 1px rgba(255, 255, 255, 0.03);
+  gap: 1rem;
+  box-shadow: 0 22px 48px rgba(0, 0, 0, 0.5);
   transition: border-color 0.35s ease, box-shadow 0.35s ease;
 }
 
@@ -536,24 +377,24 @@ body[data-phase="rest"] .chrono-stage {
   justify-content: space-between;
   align-items: center;
   flex-wrap: wrap;
-  gap: 0.75rem;
-  padding-bottom: 0.8rem;
+  gap: 0.5rem;
+  padding-bottom: 0.65rem;
   border-bottom: 1px solid var(--border-subtle);
 }
 
 .phase-indicator {
   display: inline-flex;
   align-items: center;
-  gap: 0.6rem;
+  gap: 0.5rem;
   background: rgba(255, 255, 255, 0.05);
   border: 1px solid rgba(255, 255, 255, 0.12);
-  padding: 0.42rem 0.95rem;
+  padding: 0.36rem 0.85rem;
   border-radius: 999px;
 }
 
 .pulse-beacon {
-  width: 10px;
-  height: 10px;
+  width: 9px;
+  height: 9px;
   border-radius: 50%;
   background: var(--phase-active);
   box-shadow: 0 0 12px var(--phase-active);
@@ -567,81 +408,73 @@ body[data-phase="rest"] .chrono-stage {
 
 .phase-text {
   font-family: var(--font-mono);
-  font-size: 0.8rem;
+  font-size: 0.76rem;
   font-weight: 800;
-  letter-spacing: 0.1em;
+  letter-spacing: 0.08em;
   color: #fff;
 }
 
 .round-matrix {
   display: flex;
   align-items: center;
-  gap: 0.75rem;
+  gap: 0.55rem;
 }
 
 .matrix-label {
   font-family: var(--font-mono);
-  font-size: 0.72rem;
+  font-size: 0.7rem;
   font-weight: 700;
-  letter-spacing: 0.12em;
   color: var(--text-secondary);
 }
 
 .matrix-value {
   font-family: var(--font-display);
-  font-size: 1.65rem;
+  font-size: 1.55rem;
   font-weight: 800;
   color: #fff;
 }
 
 .matrix-value small {
   color: var(--text-dim);
-  font-size: 1.15rem;
+  font-size: 1.1rem;
 }
 
 .round-pips {
   display: flex;
-  gap: 0.3rem;
+  gap: 0.25rem;
 }
 
 .round-pip {
-  width: 18px;
-  height: 7px;
-  border-radius: 4px;
+  width: 14px;
+  height: 6px;
+  border-radius: 3px;
   background: rgba(255, 255, 255, 0.12);
   transition: all 0.25s ease;
 }
 
 .round-pip.completed {
   background: var(--phase-work);
-  box-shadow: 0 0 8px rgba(16, 185, 129, 0.45);
 }
 
 .round-pip.current {
   background: var(--rear-orange);
-  box-shadow: 0 0 10px var(--rear-orange);
-  width: 26px;
+  box-shadow: 0 0 8px var(--rear-orange);
+  width: 22px;
 }
 
-/* Centerpiece Grid: Radial Dial + Heavy Bag Target Silhouette */
+/* Centerpiece Grid: Radial Dial + Heavy Bag Target Silhouette (Always 2 columns!) */
 .centerpiece-grid {
   display: grid;
   grid-template-columns: 1.25fr 0.9fr;
-  gap: 1.15rem;
+  gap: 0.9rem;
   align-items: center;
-}
-
-@media (max-width: 720px) {
-  .centerpiece-grid {
-    grid-template-columns: 1fr;
-  }
 }
 
 /* Radial SVG Chrono Dial */
 .chrono-dial-container {
   position: relative;
   width: 100%;
-  max-width: 316px;
+  max-width: 295px;
   aspect-ratio: 1 / 1;
   margin: 0 auto;
   display: grid;
@@ -707,42 +540,42 @@ body[data-phase="rest"] .dial-progress {
   align-items: center;
   justify-content: center;
   text-align: center;
-  padding: 1.5rem;
+  padding: 1rem;
 }
 
 .discipline-readout-tag {
   font-family: var(--font-mono);
-  font-size: 0.65rem;
+  font-size: 0.6rem;
   font-weight: 800;
-  letter-spacing: 0.11em;
+  letter-spacing: 0.09em;
   color: var(--lead-cyan);
   background: rgba(6, 182, 212, 0.12);
   border: 1px solid rgba(6, 182, 212, 0.32);
-  padding: 0.22rem 0.6rem;
+  padding: 0.18rem 0.5rem;
   border-radius: 999px;
-  margin-bottom: 0.3rem;
+  margin-bottom: 0.2rem;
 }
 
 .time-numerals {
   font-family: var(--font-display);
-  font-size: clamp(4.3rem, 6.8vw, 5.6rem);
+  font-size: clamp(3.1rem, 6.2vw, 5.4rem);
   font-weight: 900;
   line-height: 0.92;
   letter-spacing: 0.01em;
   font-variant-numeric: tabular-nums;
   color: #fff;
   text-shadow: 0 6px 24px rgba(0, 0, 0, 0.65);
-  margin: 0.15rem 0 0.5rem;
+  margin: 0.1rem 0 0.4rem;
 }
 
 .chrono-submetrics {
   display: flex;
   align-items: center;
-  gap: 0.75rem;
+  gap: 0.5rem;
   background: rgba(255, 255, 255, 0.04);
   border: 1px solid var(--border-subtle);
-  padding: 0.3rem 0.85rem;
-  border-radius: 10px;
+  padding: 0.24rem 0.65rem;
+  border-radius: 9px;
 }
 
 .submetric {
@@ -753,21 +586,25 @@ body[data-phase="rest"] .dial-progress {
 
 .sub-lbl {
   font-family: var(--font-mono);
-  font-size: 0.58rem;
+  font-size: 0.54rem;
   color: var(--text-dim);
-  letter-spacing: 0.08em;
+  letter-spacing: 0.06em;
 }
 
 .sub-val {
   font-family: var(--font-mono);
-  font-size: 0.82rem;
+  font-size: 0.76rem;
   font-weight: 800;
   color: var(--text-primary);
 }
 
+.kcal-highlight {
+  color: #fb923c !important;
+}
+
 .submetric-divider {
   width: 1px;
-  height: 20px;
+  height: 18px;
   background: var(--border-subtle);
 }
 
@@ -776,12 +613,12 @@ body[data-phase="rest"] .dial-progress {
   background: linear-gradient(180deg, rgba(14, 20, 32, 0.85), rgba(8, 12, 20, 0.9));
   border: 1px solid var(--border-subtle);
   border-top: 1px solid var(--border-highlight);
-  border-radius: 16px;
-  padding: 0.9rem 1rem;
+  border-radius: 15px;
+  padding: 0.7rem 0.8rem;
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 0.5rem;
+  gap: 0.4rem;
 }
 
 .bag-header {
@@ -793,45 +630,45 @@ body[data-phase="rest"] .dial-progress {
 
 .bag-title {
   font-family: var(--font-mono);
-  font-size: 0.66rem;
+  font-size: 0.62rem;
   font-weight: 800;
-  letter-spacing: 0.1em;
+  letter-spacing: 0.08em;
   color: var(--text-secondary);
 }
 
 .stance-legend {
   display: flex;
-  gap: 0.55rem;
+  gap: 0.45rem;
   font-family: var(--font-mono);
-  font-size: 0.64rem;
+  font-size: 0.62rem;
   font-weight: 700;
 }
 
 .legend-item {
   display: inline-flex;
   align-items: center;
-  gap: 0.28rem;
+  gap: 0.22rem;
 }
 
 .dot-lead {
-  width: 7px;
-  height: 7px;
+  width: 6px;
+  height: 6px;
   border-radius: 50%;
   background: var(--lead-cyan);
   box-shadow: 0 0 6px var(--lead-cyan);
 }
 
 .dot-rear {
-  width: 7px;
-  height: 7px;
+  width: 6px;
+  height: 6px;
   border-radius: 50%;
   background: var(--rear-orange);
   box-shadow: 0 0 6px var(--rear-orange);
 }
 
 .bag-svg-wrap {
-  width: 150px;
-  height: 222px;
+  width: 136px;
+  height: 204px;
   display: grid;
   place-items: center;
   transform-origin: 50% 6%;
@@ -892,29 +729,188 @@ body[data-phase="rest"] .dial-progress {
 
 .bag-active-callout {
   font-family: var(--font-mono);
-  font-size: 0.72rem;
+  font-size: 0.68rem;
   font-weight: 700;
   color: var(--text-primary);
   text-align: center;
   background: rgba(255, 255, 255, 0.05);
   border: 1px solid var(--border-subtle);
-  padding: 0.32rem 0.65rem;
-  border-radius: 7px;
+  padding: 0.26rem 0.5rem;
+  border-radius: 6px;
   width: 100%;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
 }
 
+/* Polar Biometrics Telemetry Strip */
+.polar-telemetry-strip {
+  background: linear-gradient(180deg, rgba(15, 21, 33, 0.92), rgba(9, 13, 21, 0.96));
+  border: 1px solid var(--border-highlight);
+  border-radius: 14px;
+  padding: 0.7rem 0.95rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+}
+
+.polar-left {
+  display: flex;
+  align-items: center;
+  gap: 0.8rem;
+  flex: 1;
+  min-width: 210px;
+}
+
+.bpm-readout-box {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  background: rgba(244, 63, 94, 0.1);
+  border: 1px solid rgba(244, 63, 94, 0.32);
+  padding: 0.32rem 0.65rem;
+  border-radius: 10px;
+}
+
+.bpm-heart {
+  color: #f43f5e;
+  font-size: 1.25rem;
+  animation: heartBeat var(--beat-dur, 0.85s) infinite ease-in-out;
+}
+
+.bpm-numerals {
+  font-family: var(--font-display);
+  font-size: 2rem;
+  font-weight: 900;
+  line-height: 0.9;
+  color: #fff;
+  font-variant-numeric: tabular-nums;
+  min-width: 40px;
+  text-align: center;
+}
+
+.bpm-unit-stack {
+  display: flex;
+  flex-direction: column;
+}
+
+.bpm-unit {
+  font-family: var(--font-mono);
+  font-size: 0.6rem;
+  font-weight: 800;
+  color: #fb7185;
+}
+
+.bpm-pct {
+  font-family: var(--font-mono);
+  font-size: 0.56rem;
+  color: var(--text-secondary);
+}
+
+.polar-meta {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 0.32rem;
+}
+
+.polar-device-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+.polar-device-name {
+  font-family: var(--font-mono);
+  font-size: 0.64rem;
+  font-weight: 800;
+  letter-spacing: 0.06em;
+  color: var(--text-secondary);
+}
+
+.hr-zone-pill {
+  font-family: var(--font-mono);
+  font-size: 0.6rem;
+  font-weight: 800;
+  padding: 0.12rem 0.45rem;
+  border-radius: 5px;
+  background: rgba(255, 255, 255, 0.07);
+  color: #fff;
+}
+
+.hr-zone-bar {
+  position: relative;
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 3px;
+  height: 13px;
+  border-radius: 6px;
+}
+
+.hr-zone-seg {
+  border-radius: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--font-mono);
+  font-size: 0.52rem;
+  font-weight: 800;
+  color: rgba(255, 255, 255, 0.85);
+}
+
+.hr-zone-seg.z1 { background: rgba(56, 189, 248, 0.45); }
+.hr-zone-seg.z2 { background: rgba(16, 185, 129, 0.55); }
+.hr-zone-seg.z3 { background: rgba(245, 158, 11, 0.65); }
+.hr-zone-seg.z4 { background: rgba(249, 115, 22, 0.75); }
+.hr-zone-seg.z5 { background: rgba(225, 29, 72, 0.85); }
+
+.hr-zone-marker {
+  position: absolute;
+  top: -3px;
+  bottom: -3px;
+  width: 4px;
+  background: #fff;
+  border-radius: 2px;
+  box-shadow: 0 0 8px #fff;
+  transition: left 0.3s ease;
+}
+
+.polar-right {
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+}
+
+#hr-sparkline {
+  background: rgba(7, 10, 16, 0.75);
+  border: 1px solid var(--border-subtle);
+  border-radius: 8px;
+}
+
+.polar-Quick-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.55rem;
+}
+
+.hrr-metric {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+}
+
 /* Live Combination Telemetry Deck */
 .combo-telemetry-deck {
   background: linear-gradient(180deg, rgba(16, 23, 36, 0.94), rgba(9, 13, 21, 0.96));
   border: 1px solid var(--border-highlight);
-  border-radius: 16px;
-  padding: 1.05rem 1.2rem;
+  border-radius: 15px;
+  padding: 0.95rem 1.1rem;
   display: flex;
   flex-direction: column;
-  gap: 0.7rem;
+  gap: 0.6rem;
   position: relative;
   overflow: hidden;
 }
@@ -934,30 +930,29 @@ body[data-phase="rest"] .dial-progress {
   justify-content: space-between;
   align-items: center;
   flex-wrap: wrap;
-  gap: 0.5rem;
+  gap: 0.45rem;
 }
 
 .combo-deck-titles {
   display: flex;
   align-items: center;
-  gap: 0.6rem;
+  gap: 0.5rem;
   flex-wrap: wrap;
 }
 
 .combo-kicker {
   font-family: var(--font-mono);
-  font-size: 0.68rem;
+  font-size: 0.66rem;
   font-weight: 800;
-  letter-spacing: 0.11em;
+  letter-spacing: 0.1em;
   color: var(--text-secondary);
 }
 
 .alt-proof-badge {
   font-family: var(--font-mono);
-  font-size: 0.65rem;
+  font-size: 0.62rem;
   font-weight: 800;
-  letter-spacing: 0.06em;
-  padding: 0.2rem 0.55rem;
+  padding: 0.16rem 0.5rem;
   border-radius: 6px;
   background: rgba(16, 185, 129, 0.15);
   color: #34d399;
@@ -966,25 +961,53 @@ body[data-phase="rest"] .dial-progress {
 
 .combo-deck-actions {
   display: flex;
-  gap: 0.45rem;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+}
+
+.length-pills {
+  display: inline-flex;
+  background: rgba(7, 10, 16, 0.85);
+  border: 1px solid var(--border-subtle);
+  border-radius: 8px;
+  padding: 0.15rem;
+  gap: 0.15rem;
+}
+
+.len-pill {
+  background: transparent;
+  color: var(--text-secondary);
+  border: none;
+  border-radius: 6px;
+  padding: 0.22rem 0.48rem;
+  font-family: var(--font-mono);
+  font-size: 0.68rem;
+  font-weight: 800;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.len-pill:hover {
+  color: #fff;
+}
+
+.len-pill.active {
+  background: var(--lead-cyan);
+  color: #03151a;
 }
 
 .action-chip {
   background: rgba(255, 255, 255, 0.06);
   color: var(--text-primary);
   border: 1px solid var(--border-highlight);
-  padding: 0.38rem 0.75rem;
+  padding: 0.36rem 0.68rem;
   border-radius: 8px;
   font-family: var(--font-sans);
-  font-size: 0.76rem;
+  font-size: 0.74rem;
   font-weight: 700;
   cursor: pointer;
   transition: all 0.15s ease;
-}
-
-.action-chip:hover {
-  background: rgba(255, 255, 255, 0.12);
-  transform: translateY(-1px);
 }
 
 .action-chip.accent-chip {
@@ -996,34 +1019,28 @@ body[data-phase="rest"] .dial-progress {
 
 .combo-headline {
   font-family: var(--font-display);
-  font-size: clamp(1.45rem, 2.3vw, 1.95rem);
+  font-size: clamp(1.35rem, 2.2vw, 1.9rem);
   font-weight: 800;
   letter-spacing: 0.02em;
   color: #fff;
   line-height: 1.15;
 }
 
-/* Alternating Strike Cards Chain (Never leaves an orphan stretched card) */
+/* Alternating Strike Cards Chain */
 .strike-chain-grid {
   display: grid;
   grid-template-columns: repeat(var(--strike-count, 4), minmax(0, 1fr));
-  gap: 0.5rem;
-}
-
-@media (max-width: 680px) {
-  .strike-chain-grid {
-    grid-template-columns: repeat(2, 1fr);
-  }
+  gap: 0.45rem;
 }
 
 .strike-card {
   background: rgba(15, 23, 42, 0.78);
   border: 1px solid var(--border-subtle);
-  border-radius: 11px;
-  padding: 0.55rem 0.65rem;
+  border-radius: 10px;
+  padding: 0.48rem 0.58rem;
   display: flex;
   flex-direction: column;
-  gap: 0.26rem;
+  gap: 0.22rem;
   position: relative;
   transition: transform 0.18s ease, border-color 0.18s ease, box-shadow 0.18s ease;
 }
@@ -1037,7 +1054,7 @@ body[data-phase="rest"] .dial-progress {
 }
 
 .strike-card.strike-active {
-  transform: translateY(-3px) scale(1.02);
+  transform: translateY(-2px) scale(1.02);
 }
 
 .strike-card.side-L.strike-active {
@@ -1060,18 +1077,17 @@ body[data-phase="rest"] .dial-progress {
 
 .strike-seq {
   font-family: var(--font-mono);
-  font-size: 0.64rem;
+  font-size: 0.6rem;
   font-weight: 800;
   color: var(--text-dim);
 }
 
 .limb-pill {
   font-family: var(--font-mono);
-  font-size: 0.6rem;
+  font-size: 0.56rem;
   font-weight: 800;
-  padding: 0.1rem 0.38rem;
+  padding: 0.08rem 0.34rem;
   border-radius: 4px;
-  letter-spacing: 0.04em;
 }
 
 .limb-pill.limb-L {
@@ -1088,9 +1104,8 @@ body[data-phase="rest"] .dial-progress {
 
 .strike-title {
   font-family: var(--font-display);
-  font-size: 1.12rem;
+  font-size: 1.05rem;
   font-weight: 800;
-  letter-spacing: 0.02em;
   color: #fff;
   line-height: 1.1;
   white-space: nowrap;
@@ -1100,31 +1115,31 @@ body[data-phase="rest"] .dial-progress {
 
 .strike-zone-tag {
   font-family: var(--font-mono);
-  font-size: 0.6rem;
+  font-size: 0.58rem;
   color: var(--text-secondary);
 }
 
 /* Glove-Friendly Transport Dock */
 .transport-dock {
   display: grid;
-  grid-template-columns: 2.1fr 1.1fr 0.9fr;
-  gap: 0.75rem;
+  grid-template-columns: 2fr 1fr 0.9fr;
+  gap: 0.65rem;
 }
 
 .dock-btn {
   border: none;
-  border-radius: 14px;
-  padding: 1rem 1.1rem;
+  border-radius: 13px;
+  padding: 0.95rem 0.9rem;
   font-family: var(--font-display);
-  font-size: 1.35rem;
+  font-size: 1.3rem;
   font-weight: 900;
-  letter-spacing: 0.06em;
+  letter-spacing: 0.05em;
   cursor: pointer;
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  gap: 0.55rem;
-  transition: transform 0.12s ease, filter 0.18s ease, box-shadow 0.18s ease;
+  gap: 0.45rem;
+  transition: transform 0.12s ease, box-shadow 0.18s ease;
 }
 
 .dock-btn:active:not(:disabled) {
@@ -1214,29 +1229,29 @@ body[data-phase="rest"] .dial-progress {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  gap: 0.75rem;
+  gap: 0.55rem;
   background: rgba(9, 13, 21, 0.55);
   border: 1px solid var(--border-subtle);
   border-radius: 11px;
-  padding: 0.48rem 0.75rem;
+  padding: 0.48rem 0.7rem;
 }
 
 .param-meta label {
   display: block;
-  font-size: 0.83rem;
+  font-size: 0.82rem;
   font-weight: 700;
   color: var(--text-primary);
 }
 
 .param-sub {
-  font-size: 0.68rem;
+  font-size: 0.67rem;
   color: var(--text-dim);
 }
 
 .param-controls {
   display: flex;
   align-items: center;
-  gap: 0.35rem;
+  gap: 0.3rem;
 }
 
 .step-btn {
@@ -1244,20 +1259,15 @@ body[data-phase="rest"] .dial-progress {
   color: var(--text-primary);
   border: 1px solid var(--border-highlight);
   border-radius: 7px;
-  padding: 0.32rem 0.55rem;
+  padding: 0.34rem 0.52rem;
   font-family: var(--font-mono);
   font-size: 0.72rem;
   font-weight: 700;
   cursor: pointer;
-  transition: background 0.15s ease;
-}
-
-.step-btn:hover {
-  background: rgba(51, 65, 85, 0.95);
 }
 
 .param-controls input {
-  width: 56px;
+  width: 54px;
   text-align: center;
   background: #070a10;
   color: #fff;
@@ -1271,10 +1281,10 @@ body[data-phase="rest"] .dial-progress {
 
 .param-badge {
   font-family: var(--font-mono);
-  font-size: 0.74rem;
+  font-size: 0.72rem;
   font-weight: 800;
   color: var(--lead-cyan);
-  min-width: 46px;
+  min-width: 48px;
   text-align: right;
 }
 
@@ -1362,7 +1372,7 @@ select,
   border-radius: 9px;
   padding: 0.5rem 0.68rem;
   font-family: var(--font-sans);
-  font-size: 0.81rem;
+  font-size: 0.85rem;
   font-weight: 600;
 }
 
@@ -1393,11 +1403,10 @@ select,
   color: var(--text-secondary);
   border: 1px solid var(--border-subtle);
   border-radius: 7px;
-  padding: 0.35rem 0.3rem;
+  padding: 0.38rem 0.3rem;
   font-size: 0.69rem;
   font-weight: 700;
   cursor: pointer;
-  transition: all 0.15s ease;
 }
 
 .persona-pill.active,
@@ -1469,4 +1478,214 @@ input[type="range"] {
   padding: 0.3rem 0.6rem;
   border-radius: 7px;
   font-size: 0.75rem;
+}
+
+/* Mobile Bottom Navigation Bar (Hidden on Desktop, Active on Mobile/Tablet) */
+.mobile-bottom-nav {
+  display: none;
+}
+
+/* ---------------------------------------------------------------------------
+   MOBILE & IPHONE BROWSER OPTIMIZATION (< 980px)
+   --------------------------------------------------------------------------- */
+@media (max-width: 980px) {
+  .app-shell {
+    padding: 0.55rem 0.65rem calc(4.8rem + env(safe-area-inset-bottom, 0px));
+    gap: 0.65rem;
+  }
+
+  .top-nav {
+    padding: 0.55rem 0.75rem;
+    border-radius: 13px;
+    gap: 0.5rem;
+  }
+
+  .brand-row {
+    width: 100%;
+  }
+
+  .brand-name {
+    font-size: 1.35rem;
+  }
+
+  .brand-kicker {
+    font-size: 0.54rem;
+  }
+
+  .mode-switcher {
+    width: 100%;
+  }
+
+  .command-deck {
+    grid-template-columns: 1fr;
+    gap: 0.85rem;
+  }
+
+  /* Tab-based view switching on mobile so everything fits cleanly without clutter */
+  body[data-mobile-tab="workout"] .mobile-panel:not([data-panel="workout"]) {
+    display: none;
+  }
+  body[data-mobile-tab="timers"] .mobile-panel:not([data-panel="timers"]) {
+    display: none;
+  }
+  body[data-mobile-tab="voice"] .mobile-panel:not([data-panel="voice"]) {
+    display: none;
+  }
+
+  .chrono-stage {
+    padding: 0.8rem 0.85rem;
+    border-radius: 16px;
+    gap: 0.65rem;
+  }
+
+  /* Keep Radial Chrono and Heavy Bag Side-by-Side in a compact mobile cockpit! */
+  .centerpiece-grid {
+    grid-template-columns: 1.18fr 0.82fr;
+    gap: 0.55rem;
+  }
+
+  .chrono-dial-container {
+    max-width: 196px;
+  }
+
+  .time-numerals {
+    font-size: 3.15rem;
+    margin: 0.05rem 0 0.25rem;
+  }
+
+  .discipline-readout-tag {
+    font-size: 0.5rem;
+    padding: 0.12rem 0.4rem;
+  }
+
+  .chrono-submetrics {
+    padding: 0.18rem 0.42rem;
+    gap: 0.35rem;
+  }
+
+  .sub-lbl {
+    font-size: 0.48rem;
+  }
+
+  .sub-val {
+    font-size: 0.68rem;
+  }
+
+  .bag-visualizer-card {
+    padding: 0.45rem 0.5rem;
+    border-radius: 12px;
+  }
+
+  .bag-svg-wrap {
+    width: 98px;
+    height: 148px;
+  }
+
+  .bag-active-callout {
+    font-size: 0.58rem;
+    padding: 0.2rem 0.35rem;
+  }
+
+  .combo-telemetry-deck {
+    padding: 0.7rem 0.8rem;
+    gap: 0.45rem;
+  }
+
+  .combo-headline {
+    font-size: 1.28rem;
+  }
+
+  .strike-chain-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 0.38rem;
+  }
+
+  .strike-card {
+    padding: 0.38rem 0.5rem;
+  }
+
+  .strike-title {
+    font-size: 0.96rem;
+  }
+
+  .dock-btn {
+    padding: 0.82rem 0.6rem;
+    font-size: 1.12rem;
+    border-radius: 11px;
+  }
+
+  .polar-telemetry-strip {
+    padding: 0.55rem 0.7rem;
+    gap: 0.5rem;
+  }
+
+  .bpm-numerals {
+    font-size: 1.65rem;
+  }
+
+  .polar-right {
+    width: 100%;
+    justify-content: space-between;
+  }
+
+  .preset-strip {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .persona-pills {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .field-row-2col,
+  .voice-sliders-row {
+    grid-template-columns: 1fr;
+  }
+
+  /* Fixed Bottom Tab Bar for Mobile */
+  .mobile-bottom-nav {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 0.25rem;
+    position: fixed;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: 100;
+    background: rgba(10, 14, 22, 0.95);
+    backdrop-filter: blur(18px);
+    border-top: 1px solid var(--border-highlight);
+    padding: 0.4rem 0.5rem calc(0.45rem + env(safe-area-inset-bottom, 0px));
+    box-shadow: 0 -10px 28px rgba(0, 0, 0, 0.6);
+  }
+
+  .mob-tab-btn {
+    background: transparent;
+    border: none;
+    color: var(--text-secondary);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 0.15rem;
+    padding: 0.35rem 0.2rem;
+    border-radius: 10px;
+    font-family: var(--font-sans);
+    cursor: pointer;
+  }
+
+  .mob-tab-icon {
+    font-size: 1.05rem;
+    line-height: 1;
+  }
+
+  .mob-tab-lbl {
+    font-size: 0.65rem;
+    font-weight: 700;
+  }
+
+  .mob-tab-btn.active {
+    background: rgba(249, 115, 22, 0.18);
+    color: #fff;
+    box-shadow: inset 0 0 0 1px rgba(249, 115, 22, 0.45);
+  }
 }

@@ -1,14 +1,31 @@
-// STRIKE//OS — Dutch MMA, Kickboxing & Boxing Heavy Bag Timer + Voice Caller + Polar BLE HR
+// STRIKE//OS — Dutch MMA, Kickboxing & Boxing Heavy Bag Timer + Voice Caller + Polar BLE HR & Calorie Engine
 (() => {
   "use strict";
 
   // ---------------------------------------------------------------------------
-  // 1. STRICT ALTERNATING (L <-> R) DUTCH MMA, KICKBOXING & BOXING ARSENAL
+  // 1. EXPANDED STRICT ALTERNATING (L <-> R) DUTCH MMA, KICKBOXING & BOXING ARSENAL
   // Every strike in these combinations strictly alternates Lead (L) and Rear (R)
-  // to enforce Dutch hip-loading mechanics.
+  // across 3-, 4-, 5-, 6-, and 8-strike chains.
   // ---------------------------------------------------------------------------
   const COMBO_LIBRARY = {
     "dutch-mma": [
+      // 3-Strike Chains
+      [
+        { name: "Jab", num: "1", side: "L", zone: "head-L", tag: "HEAD L" },
+        { name: "Cross", num: "2", side: "R", zone: "head-R", tag: "HEAD R" },
+        { name: "Lead Switch Kick", num: "Switch Kick", side: "L", zone: "body-L", tag: "LIVER L" }
+      ],
+      [
+        { name: "Cross", num: "2", side: "R", zone: "head-R", tag: "HEAD R" },
+        { name: "Lead Hook", num: "3", side: "L", zone: "head-L", tag: "HEAD L" },
+        { name: "Rear Low Kick", num: "Rear Low Kick", side: "R", zone: "low-R", tag: "THIGH R" }
+      ],
+      [
+        { name: "Lead Teep", num: "Lead Teep", side: "L", zone: "body-L", tag: "CORE L" },
+        { name: "Rear Overhand", num: "Overhand", side: "R", zone: "head-R", tag: "HEAD R" },
+        { name: "Lead Switch Knee", num: "Switch Knee", side: "L", zone: "body-L", tag: "SOLAR L" }
+      ],
+      // 4-Strike Chains
       [
         { name: "Jab", num: "1", side: "L", zone: "head-L", tag: "HEAD L" },
         { name: "Cross", num: "2", side: "R", zone: "head-R", tag: "HEAD R" },
@@ -28,19 +45,12 @@
         { name: "Rear Elbow", num: "Rear Elbow", side: "R", zone: "head-R", tag: "HEAD R" }
       ],
       [
-        { name: "Jab", num: "1", side: "L", zone: "head-L", tag: "HEAD L" },
-        { name: "Cross", num: "2", side: "R", zone: "head-R", tag: "HEAD R" },
-        { name: "Sprawl Lead Frame", num: "Sprawl", side: "L", zone: "body-L", tag: "HIP L" },
-        { name: "Rear Knee", num: "Rear Knee", side: "R", zone: "body-R", tag: "BODY R" },
-        { name: "Lead Elbow", num: "Lead Elbow", side: "L", zone: "head-L", tag: "HEAD L" },
-        { name: "Rear Low Kick", num: "Rear Low Kick", side: "R", zone: "low-R", tag: "THIGH R" }
-      ],
-      [
         { name: "Lead Teep", num: "Lead Teep", side: "L", zone: "body-L", tag: "CORE L" },
         { name: "Cross", num: "2", side: "R", zone: "head-R", tag: "HEAD R" },
         { name: "Lead Body Hook", num: "3 Body", side: "L", zone: "body-L", tag: "LIVER L" },
         { name: "Rear High Kick", num: "Rear High Kick", side: "R", zone: "head-R", tag: "HEAD R" }
       ],
+      // 5-Strike Chains
       [
         { name: "Cross", num: "2", side: "R", zone: "head-R", tag: "HEAD R" },
         { name: "Lead Uppercut", num: "5", side: "L", zone: "head-L", tag: "CHIN L" },
@@ -54,20 +64,68 @@
         { name: "Lead Hook", num: "3", side: "L", zone: "head-L", tag: "HEAD L" },
         { name: "Rear Cross", num: "2", side: "R", zone: "head-R", tag: "HEAD R" },
         { name: "Lead Switch Kick", num: "Switch Kick", side: "L", zone: "body-L", tag: "BODY L" }
-      ]
-    ],
-
-    "dutch-kickboxing": [
+      ],
+      [
+        { name: "Jab", num: "1", side: "L", zone: "head-L", tag: "HEAD L" },
+        { name: "Cross", num: "2", side: "R", zone: "head-R", tag: "HEAD R" },
+        { name: "Sprawl Lead Frame", num: "Sprawl", side: "L", zone: "body-L", tag: "HIP L" },
+        { name: "Rear Knee", num: "Rear Knee", side: "R", zone: "body-R", tag: "BODY R" },
+        { name: "Lead Elbow", num: "Lead Elbow", side: "L", zone: "head-L", tag: "HEAD L" }
+      ],
+      // 6-Strike Chains
+      [
+        { name: "Jab", num: "1", side: "L", zone: "head-L", tag: "HEAD L" },
+        { name: "Cross", num: "2", side: "R", zone: "head-R", tag: "HEAD R" },
+        { name: "Sprawl Lead Frame", num: "Sprawl", side: "L", zone: "body-L", tag: "HIP L" },
+        { name: "Rear Knee", num: "Rear Knee", side: "R", zone: "body-R", tag: "BODY R" },
+        { name: "Lead Elbow", num: "Lead Elbow", side: "L", zone: "head-L", tag: "HEAD L" },
+        { name: "Rear Low Kick", num: "Rear Low Kick", side: "R", zone: "low-R", tag: "THIGH R" }
+      ],
+      [
+        { name: "Jab", num: "1", side: "L", zone: "head-L", tag: "HEAD L" },
+        { name: "Cross", num: "2", side: "R", zone: "head-R", tag: "HEAD R" },
+        { name: "Lead Body Hook", num: "Liver Shot", side: "L", zone: "body-L", tag: "LIVER L" },
+        { name: "Rear Uppercut", num: "6", side: "R", zone: "head-R", tag: "CHIN R" },
+        { name: "Lead Switch Knee", num: "Switch Knee", side: "L", zone: "body-L", tag: "CORE L" },
+        { name: "Rear High Kick", num: "Rear High Kick", side: "R", zone: "head-R", tag: "HEAD R" }
+      ],
+      [
+        { name: "Lead Inside Low Kick", num: "Inside Low", side: "L", zone: "low-L", tag: "CALF L" },
+        { name: "Cross", num: "2", side: "R", zone: "head-R", tag: "HEAD R" },
+        { name: "Lead Hook", num: "3", side: "L", zone: "head-L", tag: "HEAD L" },
+        { name: "Rear Elbow", num: "Rear Elbow", side: "R", zone: "head-R", tag: "TEMPLE R" },
+        { name: "Lead Knee", num: "Lead Knee", side: "L", zone: "body-L", tag: "BODY L" },
+        { name: "Rear Low Kick", num: "Rear Low Kick", side: "R", zone: "low-R", tag: "THIGH R" }
+      ],
+      // 8-Strike Chains
       [
         { name: "Jab", num: "1", side: "L", zone: "head-L", tag: "HEAD L" },
         { name: "Cross", num: "2", side: "R", zone: "head-R", tag: "HEAD R" },
         { name: "Lead Hook", num: "3", side: "L", zone: "head-L", tag: "HEAD L" },
-        { name: "Rear Low Kick", num: "Rear Low Kick", side: "R", zone: "low-R", tag: "THIGH R" }
+        { name: "Rear Low Kick", num: "Rear Low Kick", side: "R", zone: "low-R", tag: "THIGH R" },
+        { name: "Lead Teep", num: "Lead Teep", side: "L", zone: "body-L", tag: "CORE L" },
+        { name: "Rear Cross", num: "2", side: "R", zone: "head-R", tag: "HEAD R" },
+        { name: "Lead Switch Knee", num: "Switch Knee", side: "L", zone: "body-L", tag: "BODY L" },
+        { name: "Rear Elbow", num: "Rear Elbow", side: "R", zone: "head-R", tag: "HEAD R" }
+      ]
+    ],
+
+    "dutch-kickboxing": [
+      // 3-Strike Chains
+      [
+        { name: "Jab", num: "1", side: "L", zone: "head-L", tag: "HEAD L" },
+        { name: "Cross", num: "2", side: "R", zone: "head-R", tag: "HEAD R" },
+        { name: "Lead Switch Kick", num: "Switch Kick", side: "L", zone: "body-L", tag: "LIVER L" }
       ],
       [
         { name: "Cross", num: "2", side: "R", zone: "head-R", tag: "HEAD R" },
-        { name: "Lead Body Hook", num: "Liver Shot", side: "L", zone: "body-L", tag: "LIVER L" },
-        { name: "Rear Uppercut", num: "6", side: "R", zone: "head-R", tag: "CHIN R" },
+        { name: "Lead Hook", num: "3", side: "L", zone: "head-L", tag: "HEAD L" },
+        { name: "Rear Low Kick", num: "Rear Low Kick", side: "R", zone: "low-R", tag: "THIGH R" }
+      ],
+      // 4-Strike Chains
+      [
+        { name: "Jab", num: "1", side: "L", zone: "head-L", tag: "HEAD L" },
+        { name: "Cross", num: "2", side: "R", zone: "head-R", tag: "HEAD R" },
         { name: "Lead Hook", num: "3", side: "L", zone: "head-L", tag: "HEAD L" },
         { name: "Rear Low Kick", num: "Rear Low Kick", side: "R", zone: "low-R", tag: "THIGH R" }
       ],
@@ -84,6 +142,20 @@
         { name: "Rear Body Kick", num: "Rear Body Kick", side: "R", zone: "body-R", tag: "RIBS R" }
       ],
       [
+        { name: "Lead Hook", num: "3", side: "L", zone: "head-L", tag: "HEAD L" },
+        { name: "Cross", num: "2", side: "R", zone: "head-R", tag: "HEAD R" },
+        { name: "Lead Body Hook", num: "Liver Hook", side: "L", zone: "body-L", tag: "LIVER L" },
+        { name: "Rear Low Kick", num: "Rear Low Kick", side: "R", zone: "low-R", tag: "THIGH R" }
+      ],
+      // 5-Strike Chains
+      [
+        { name: "Cross", num: "2", side: "R", zone: "head-R", tag: "HEAD R" },
+        { name: "Lead Body Hook", num: "Liver Shot", side: "L", zone: "body-L", tag: "LIVER L" },
+        { name: "Rear Uppercut", num: "6", side: "R", zone: "head-R", tag: "CHIN R" },
+        { name: "Lead Hook", num: "3", side: "L", zone: "head-L", tag: "HEAD L" },
+        { name: "Rear Low Kick", num: "Rear Low Kick", side: "R", zone: "low-R", tag: "THIGH R" }
+      ],
+      [
         { name: "Jab", num: "1", side: "L", zone: "head-L", tag: "HEAD L" },
         { name: "Cross Body", num: "2 Body", side: "R", zone: "body-R", tag: "SOLAR R" },
         { name: "Lead Hook", num: "3", side: "L", zone: "head-L", tag: "HEAD L" },
@@ -91,26 +163,60 @@
         { name: "Lead Switch Kick", num: "Switch Kick", side: "L", zone: "head-L", tag: "HEAD L" }
       ],
       [
-        { name: "Lead Hook", num: "3", side: "L", zone: "head-L", tag: "HEAD L" },
+        { name: "Jab", num: "1", side: "L", zone: "head-L", tag: "HEAD L" },
         { name: "Cross", num: "2", side: "R", zone: "head-R", tag: "HEAD R" },
-        { name: "Lead Body Hook", num: "Liver Hook", side: "L", zone: "body-L", tag: "LIVER L" },
+        { name: "Lead Uppercut", num: "5", side: "L", zone: "head-L", tag: "CHIN L" },
+        { name: "Cross", num: "2", side: "R", zone: "head-R", tag: "HEAD R" },
+        { name: "Lead Switch Kick", num: "Switch Kick", side: "L", zone: "body-L", tag: "LIVER L" }
+      ],
+      // 6-Strike Chains
+      [
+        { name: "Jab", num: "1", side: "L", zone: "head-L", tag: "HEAD L" },
+        { name: "Cross", num: "2", side: "R", zone: "head-R", tag: "HEAD R" },
+        { name: "Lead Hook", num: "3", side: "L", zone: "head-L", tag: "HEAD L" },
+        { name: "Rear Cross", num: "2", side: "R", zone: "head-R", tag: "HEAD R" },
+        { name: "Lead Body Hook", num: "3 Body", side: "L", zone: "body-L", tag: "LIVER L" },
         { name: "Rear Low Kick", num: "Rear Low Kick", side: "R", zone: "low-R", tag: "THIGH R" }
+      ],
+      [
+        { name: "Lead Inside Low Kick", num: "Inside Low", side: "L", zone: "low-L", tag: "CALF L" },
+        { name: "Cross", num: "2", side: "R", zone: "head-R", tag: "HEAD R" },
+        { name: "Lead Hook", num: "3", side: "L", zone: "head-L", tag: "HEAD L" },
+        { name: "Rear Uppercut", num: "6", side: "R", zone: "head-R", tag: "CHIN R" },
+        { name: "Lead Hook", num: "3", side: "L", zone: "head-L", tag: "HEAD L" },
+        { name: "Rear High Kick", num: "Rear High Kick", side: "R", zone: "head-R", tag: "HEAD R" }
+      ],
+      // 8-Strike Chains
+      [
+        { name: "Jab", num: "1", side: "L", zone: "head-L", tag: "HEAD L" },
+        { name: "Cross", num: "2", side: "R", zone: "head-R", tag: "HEAD R" },
+        { name: "Lead Hook", num: "3", side: "L", zone: "head-L", tag: "HEAD L" },
+        { name: "Rear Low Kick", num: "Rear Low Kick", side: "R", zone: "low-R", tag: "THIGH R" },
+        { name: "Lead Hook", num: "3", side: "L", zone: "head-L", tag: "HEAD L" },
+        { name: "Rear Cross", num: "2", side: "R", zone: "head-R", tag: "HEAD R" },
+        { name: "Lead Body Hook", num: "Liver Shot", side: "L", zone: "body-L", tag: "LIVER L" },
+        { name: "Rear Body Kick", num: "Rear Body Kick", side: "R", zone: "body-R", tag: "RIBS R" }
       ]
     ],
 
     "boxing": [
+      // 3-Strike Chains
+      [
+        { name: "Jab", num: "1", side: "L", zone: "head-L", tag: "HEAD L" },
+        { name: "Cross", num: "2", side: "R", zone: "head-R", tag: "HEAD R" },
+        { name: "Lead Hook", num: "3", side: "L", zone: "head-L", tag: "HEAD L" }
+      ],
+      [
+        { name: "Cross", num: "2", side: "R", zone: "head-R", tag: "HEAD R" },
+        { name: "Lead Hook", num: "3", side: "L", zone: "head-L", tag: "HEAD L" },
+        { name: "Rear Cross", num: "2", side: "R", zone: "head-R", tag: "HEAD R" }
+      ],
+      // 4-Strike Chains
       [
         { name: "Jab", num: "1", side: "L", zone: "head-L", tag: "HEAD L" },
         { name: "Cross", num: "2", side: "R", zone: "head-R", tag: "HEAD R" },
         { name: "Lead Hook", num: "3", side: "L", zone: "head-L", tag: "HEAD L" },
         { name: "Rear Cross", num: "2", side: "R", zone: "head-R", tag: "HEAD R" }
-      ],
-      [
-        { name: "Jab", num: "1", side: "L", zone: "head-L", tag: "HEAD L" },
-        { name: "Cross", num: "2", side: "R", zone: "head-R", tag: "HEAD R" },
-        { name: "Lead Uppercut", num: "5", side: "L", zone: "head-L", tag: "CHIN L" },
-        { name: "Rear Cross", num: "2", side: "R", zone: "head-R", tag: "HEAD R" },
-        { name: "Lead Hook", num: "3", side: "L", zone: "head-L", tag: "HEAD L" }
       ],
       [
         { name: "Cross", num: "2", side: "R", zone: "head-R", tag: "HEAD R" },
@@ -124,6 +230,14 @@
         { name: "Lead Hook", num: "3", side: "L", zone: "head-L", tag: "HEAD L" },
         { name: "Rear Overhand", num: "Overhand", side: "R", zone: "head-R", tag: "HEAD R" }
       ],
+      // 5-Strike Chains
+      [
+        { name: "Jab", num: "1", side: "L", zone: "head-L", tag: "HEAD L" },
+        { name: "Cross", num: "2", side: "R", zone: "head-R", tag: "HEAD R" },
+        { name: "Lead Uppercut", num: "5", side: "L", zone: "head-L", tag: "CHIN L" },
+        { name: "Rear Cross", num: "2", side: "R", zone: "head-R", tag: "HEAD R" },
+        { name: "Lead Hook", num: "3", side: "L", zone: "head-L", tag: "HEAD L" }
+      ],
       [
         { name: "Lead Hook", num: "3", side: "L", zone: "head-L", tag: "HEAD L" },
         { name: "Cross", num: "2", side: "R", zone: "head-R", tag: "HEAD R" },
@@ -131,6 +245,7 @@
         { name: "Rear Cross", num: "2", side: "R", zone: "head-R", tag: "HEAD R" },
         { name: "Lead Body Hook", num: "Liver Shot", side: "L", zone: "body-L", tag: "LIVER L" }
       ],
+      // 6-Strike Chains
       [
         { name: "Jab", num: "1", side: "L", zone: "head-L", tag: "HEAD L" },
         { name: "Cross", num: "2", side: "R", zone: "head-R", tag: "HEAD R" },
@@ -138,6 +253,25 @@
         { name: "Rear Uppercut", num: "6", side: "R", zone: "head-R", tag: "CHIN R" },
         { name: "Lead Hook", num: "3", side: "L", zone: "head-L", tag: "HEAD L" },
         { name: "Cross", num: "2", side: "R", zone: "head-R", tag: "HEAD R" }
+      ],
+      [
+        { name: "Jab", num: "1", side: "L", zone: "head-L", tag: "HEAD L" },
+        { name: "Cross", num: "2", side: "R", zone: "head-R", tag: "HEAD R" },
+        { name: "Lead Body Hook", num: "Liver Shot", side: "L", zone: "body-L", tag: "LIVER L" },
+        { name: "Rear Uppercut", num: "6", side: "R", zone: "head-R", tag: "CHIN R" },
+        { name: "Lead Hook", num: "3", side: "L", zone: "head-L", tag: "HEAD L" },
+        { name: "Rear Overhand", num: "Overhand", side: "R", zone: "head-R", tag: "HEAD R" }
+      ],
+      // 8-Strike Chains
+      [
+        { name: "Jab", num: "1", side: "L", zone: "head-L", tag: "HEAD L" },
+        { name: "Cross", num: "2", side: "R", zone: "head-R", tag: "HEAD R" },
+        { name: "Lead Hook", num: "3", side: "L", zone: "head-L", tag: "HEAD L" },
+        { name: "Rear Cross", num: "2", side: "R", zone: "head-R", tag: "HEAD R" },
+        { name: "Lead Body Hook", num: "3 Body", side: "L", zone: "body-L", tag: "LIVER L" },
+        { name: "Rear Uppercut", num: "6", side: "R", zone: "head-R", tag: "CHIN R" },
+        { name: "Lead Hook", num: "3", side: "L", zone: "head-L", tag: "HEAD L" },
+        { name: "Rear Cross", num: "2", side: "R", zone: "head-R", tag: "HEAD R" }
       ]
     ]
   };
@@ -164,6 +298,22 @@
       { name: "Rear High Kick", num: "Rear High Kick", side: "R", zone: "head-R", tag: "HEAD R" },
       { name: "Rear Knee", num: "Rear Knee", side: "R", zone: "body-R", tag: "BODY R" },
       { name: "Rear Elbow", num: "Rear Elbow", side: "R", zone: "head-R", tag: "TEMPLE R" }
+    ]
+  };
+
+  const BOXING_POOLS = {
+    L: [
+      { name: "Jab", num: "1", side: "L", zone: "head-L", tag: "HEAD L" },
+      { name: "Lead Hook", num: "3", side: "L", zone: "head-L", tag: "HEAD L" },
+      { name: "Lead Body Hook", num: "3 Body", side: "L", zone: "body-L", tag: "LIVER L" },
+      { name: "Lead Uppercut", num: "5", side: "L", zone: "head-L", tag: "CHIN L" },
+      { name: "Lead Slip", num: "Slip Outside", side: "L", zone: "head-L", tag: "EVADE L" }
+    ],
+    R: [
+      { name: "Cross", num: "2", side: "R", zone: "head-R", tag: "HEAD R" },
+      { name: "Rear Uppercut", num: "6", side: "R", zone: "head-R", tag: "CHIN R" },
+      { name: "Rear Overhand", num: "Overhand", side: "R", zone: "head-R", tag: "HEAD R" },
+      { name: "Rear Body Cross", num: "2 Body", side: "R", zone: "body-R", tag: "SOLAR R" }
     ]
   };
 
@@ -195,6 +345,8 @@
     prepSec: 10,
     warnSec: 10,
     maxHr: 190,
+    weightLbs: 180,
+    comboLengthMode: "mix", // "mix" | "3" | "4" | "5" | "6" | "8"
     remainingMs: 180000,
     phaseDurationMs: 180000,
     lastTickTs: 0,
@@ -202,17 +354,18 @@
     combosCalled: 0,
     totalWorkElapsedMs: 0,
     nextComboAtMs: 0,
-    currentCombo: COMBO_LIBRARY["dutch-mma"][0],
+    currentCombo: COMBO_LIBRARY["dutch-mma"][3],
     customCombos: [
       "Jab, Cross, Lead Hook, Rear Low Kick",
       "Cross, Lead Body Hook, Cross, Lead Switch Kick"
     ],
     voices: [],
     selectedVoiceURI: "",
+    speechUnlocked: false,
     zoneAnimTimers: [],
     wakeLock: null,
 
-    // Polar BLE Heart Rate State
+    // Polar BLE Heart Rate & Calorie State
     polarDevice: null,
     polarConnected: false,
     polarSimulated: false,
@@ -221,7 +374,9 @@
     peakBpm: 0,
     roundEndBpm: 0,
     lastRecoveryDrop: null,
-    bpmHistory: []
+    bpmHistory: [],
+    totalCaloriesKcal: 0,
+    currentKcalPerMin: 0
   };
 
   const el = {
@@ -233,8 +388,8 @@
     disciplineBadge: document.getElementById("discipline-badge"),
     timeDisplay: document.getElementById("time-display"),
     statCombos: document.getElementById("stat-combos"),
+    statCalories: document.getElementById("stat-calories"),
     statWorkTime: document.getElementById("stat-work-time"),
-    statPeakHr: document.getElementById("stat-peak-hr"),
     bagSwingWrapper: document.getElementById("bag-swing-wrapper"),
     bagActiveCallout: document.getElementById("bag-active-callout"),
     comboDisplay: document.getElementById("combo-display"),
@@ -250,7 +405,7 @@
     soundBellTestBtn: document.getElementById("sound-bell-test-btn"),
     fullscreenBtn: document.getElementById("fullscreen-btn"),
 
-    // Polar BLE DOM elements
+    // Polar BLE & Calorie DOM elements
     polarConnectBtn: document.getElementById("polar-connect-btn"),
     polarBtnLabel: document.getElementById("polar-btn-label"),
     polarStrip: document.getElementById("polar-strip"),
@@ -261,6 +416,7 @@
     polarZonePill: document.getElementById("polar-zone-pill"),
     hrZoneMarker: document.getElementById("hr-zone-marker"),
     hrSparkline: document.getElementById("hr-sparkline"),
+    statKcalRate: document.getElementById("stat-kcal-rate"),
     statHrr: document.getElementById("stat-hrr"),
     polarSimBtn: document.getElementById("polar-sim-btn"),
 
@@ -270,6 +426,7 @@
     prepSecInput: document.getElementById("prep-sec-input"),
     warnSecInput: document.getElementById("warn-sec-input"),
     maxHrInput: document.getElementById("max-hr-input"),
+    weightLbsInput: document.getElementById("weight-lbs-input"),
 
     roundsFormatted: document.getElementById("rounds-formatted"),
     workFormatted: document.getElementById("work-formatted"),
@@ -277,9 +434,11 @@
     prepFormatted: document.getElementById("prep-formatted"),
     warnFormatted: document.getElementById("warn-formatted"),
     maxHrFormatted: document.getElementById("max-hr-formatted"),
+    weightFormatted: document.getElementById("weight-formatted"),
 
     comboEnabledToggle: document.getElementById("combo-enabled-toggle"),
     comboStyleSelect: document.getElementById("combo-style-select"),
+    comboLengthSelect: document.getElementById("combo-length-select"),
     calloutModeSelect: document.getElementById("callout-mode-select"),
     comboPaceSelect: document.getElementById("combo-pace-select"),
     voiceSelect: document.getElementById("voice-select"),
@@ -294,30 +453,41 @@
   };
 
   // ---------------------------------------------------------------------------
-  // 3. POLAR BLE HEART RATE MONITOR ENGINE (Web Bluetooth GATT 0x180D / 0x2A37)
+  // 3. POLAR BLE HEART RATE & KEYTEL CALORIE ENGINE
   // ---------------------------------------------------------------------------
+  function calculateBurnRateKcalPerMin() {
+    const weightKg = (state.weightLbs || 180) * 0.45359237;
+
+    if (state.currentBpm >= 75) {
+      const age = 30;
+      const kcalMin = (-55.0969 + 0.6309 * state.currentBpm + 0.1988 * weightKg + 0.2017 * age) / 4.184;
+      return Math.max(1.2, kcalMin);
+    }
+
+    if (!state.isRunning) return 0;
+    let met = 0;
+    if (state.phase === "work") met = 9.5;
+    else if (state.phase === "warning") met = 11.8;
+    else if (state.phase === "rest") met = 2.5;
+    else if (state.phase === "prep") met = 2.0;
+
+    return (met * 3.5 * weightKg) / 200;
+  }
+
   function parseHeartRateMeasurement(dataView) {
     const flags = dataView.getUint8(0);
     const rate16Bits = (flags & 0x01) !== 0;
     let offset = 1;
-    let bpm = 0;
-    if (rate16Bits) {
-      bpm = dataView.getUint16(offset, true);
-      offset += 2;
-    } else {
-      bpm = dataView.getUint8(offset);
-      offset += 1;
-    }
-    return bpm;
+    return rate16Bits ? dataView.getUint16(offset, true) : dataView.getUint8(offset);
   }
 
   function computeHrZone(bpm, maxHr) {
     const pct = Math.round((bpm / maxHr) * 100);
-    if (pct < 60) return { zone: 1, name: "ZONE 1 • RECOVERY", pct, color: "#38bdf8" };
-    if (pct < 70) return { zone: 2, name: "ZONE 2 • AEROBIC", pct, color: "#10b981" };
-    if (pct < 80) return { zone: 3, name: "ZONE 3 • FIGHT TEMPO", pct, color: "#f59e0b" };
-    if (pct < 90) return { zone: 4, name: "ZONE 4 • THRESHOLD", pct, color: "#f97316" };
-    return { zone: 5, name: "ZONE 5 • REDLINE MAX", pct, color: "#e11d48" };
+    if (pct < 60) return { zone: 1, name: "Z1 • RECOVERY", pct, color: "#38bdf8" };
+    if (pct < 70) return { zone: 2, name: "Z2 • AEROBIC", pct, color: "#10b981" };
+    if (pct < 80) return { zone: 3, name: "Z3 • TEMPO", pct, color: "#f59e0b" };
+    if (pct < 90) return { zone: 4, name: "Z4 • THRESHOLD", pct, color: "#f97316" };
+    return { zone: 5, name: "Z5 • REDLINE", pct, color: "#e11d48" };
   }
 
   function drawHrSparkline() {
@@ -337,7 +507,7 @@
     pts.forEach((val, idx) => {
       const x = (idx / (pts.length - 1)) * (w - 8) + 4;
       const norm = Math.max(0, Math.min(1, (val - minBpm) / (maxBpm - minBpm)));
-      const y = h - 5 - norm * (h - 10);
+      const y = h - 4 - norm * (h - 8);
       if (idx === 0) ctx.moveTo(x, y);
       else ctx.lineTo(x, y);
     });
@@ -349,11 +519,8 @@
   function ingestHeartRateSample(bpm, sourceLabel) {
     if (!bpm || bpm <= 0) return;
     state.currentBpm = bpm;
-    if (bpm > state.peakBpm) {
-      state.peakBpm = bpm;
-    }
+    if (bpm > state.peakBpm) state.peakBpm = bpm;
 
-    // Track between-round recovery drop during Rest
     if (state.phase === "rest" && state.roundEndBpm > 0) {
       const drop = Math.max(0, state.roundEndBpm - bpm);
       state.lastRecoveryDrop = drop;
@@ -365,8 +532,7 @@
 
     const zInfo = computeHrZone(bpm, state.maxHr);
     el.bpmValue.textContent = String(bpm);
-    el.hrPctMax.textContent = `${zInfo.pct}% MAX`;
-    el.statPeakHr.textContent = `${state.peakBpm}`;
+    el.hrPctMax.textContent = `${zInfo.pct}%`;
     el.polarZonePill.textContent = zInfo.name;
     el.polarZonePill.style.borderColor = zInfo.color;
     el.polarZonePill.style.color = zInfo.color;
@@ -375,13 +541,16 @@
       el.polarStatusText.textContent = sourceLabel;
     }
 
-    // Sync heart pulse animation duration to live BPM
     const beatSec = Math.max(0.3, Math.min(1.4, 60 / bpm));
     el.bpmHeartAnim.style.setProperty("--beat-dur", `${beatSec.toFixed(2)}s`);
 
-    // Position marker across 50%..100% Max HR span
     const markerPct = Math.max(2, Math.min(98, ((zInfo.pct - 50) / 50) * 100));
     el.hrZoneMarker.style.left = `${markerPct}%`;
+
+    state.currentKcalPerMin = calculateBurnRateKcalPerMin();
+    if (el.statKcalRate) {
+      el.statKcalRate.textContent = `${state.currentKcalPerMin.toFixed(1)} kcal/m`;
+    }
 
     drawHrSparkline();
   }
@@ -389,7 +558,7 @@
   async function connectPolarBluetooth() {
     if (!navigator.bluetooth) {
       alert(
-        "Web Bluetooth is not enabled in this browser. Use Chrome or Edge on Desktop/Android (via localhost or HTTPS), or click 'Sim HR' to test live heart rate telemetry."
+        "Web Bluetooth requires Chrome/Edge on PC or Android, or the Bluefy WebBLE browser on iPhone. Tap 'Sim HR' to test live Polar BPM & Calorie burn now!"
       );
       return;
     }
@@ -406,7 +575,7 @@
       device.addEventListener("gattserverdisconnected", () => {
         state.polarConnected = false;
         el.polarConnectBtn.classList.remove("connected");
-        el.polarBtnLabel.textContent = "RECONNECT POLAR HR";
+        el.polarBtnLabel.textContent = "POLAR HR";
         el.polarStatusText.textContent = `${device.name || "POLAR"} DISCONNECTED`;
       });
 
@@ -425,7 +594,7 @@
       el.polarBtnLabel.textContent = `${device.name || "POLAR"} LIVE`;
       el.polarStatusText.textContent = `${device.name || "POLAR BLE"} • CONNECTED`;
     } catch (err) {
-      el.polarStatusText.textContent = "POLAR BLE: STANDBY (CLICK SIM HR TO PREVIEW)";
+      el.polarStatusText.textContent = "POLAR BLE: STANDBY (TAP SIM HR TO PREVIEW)";
     }
   }
 
@@ -442,17 +611,18 @@
   function togglePolarSimulation() {
     if (state.polarSimulated) {
       stopPolarSimulation();
-      el.polarStatusText.textContent = "POLAR BLE SENSOR: STANDBY";
+      state.currentBpm = 0;
+      el.polarStatusText.textContent = "POLAR BLE: STANDBY";
       return;
     }
 
     state.polarSimulated = true;
     el.polarSimBtn.classList.add("accent-chip");
     el.polarSimBtn.textContent = "Sim Active";
-    let simBpm = 128;
+    let simBpm = 132;
 
     const stepSim = () => {
-      let target = 132;
+      let target = 134;
       if (state.phase === "work") target = 166;
       else if (state.phase === "warning") target = 182;
       else if (state.phase === "rest") target = 136;
@@ -460,7 +630,14 @@
 
       const drift = (target - simBpm) * 0.18 + (Math.random() * 4 - 2);
       simBpm = Math.round(Math.max(85, Math.min(state.maxHr, simBpm + drift)));
-      ingestHeartRateSample(simBpm, "POLAR H10 (SIMULATED STREAM)");
+      ingestHeartRateSample(simBpm, "POLAR H10 (SIM STREAM)");
+
+      if (!state.isRunning) {
+        state.totalCaloriesKcal += state.currentKcalPerMin / 60;
+        if (el.statCalories) {
+          el.statCalories.textContent = String(Math.round(state.totalCaloriesKcal));
+        }
+      }
     };
 
     stepSim();
@@ -468,10 +645,20 @@
   }
 
   // ---------------------------------------------------------------------------
-  // 4. SYNTHESIZED WEB AUDIO ENGINE (Ring Bell, Wooden Clapper, Countdown Pip)
+  // 4. SYNTHESIZED WEB AUDIO + MOBILE / iOS SAFARI VOICE ENGINE
   // ---------------------------------------------------------------------------
   let audioCtx = null;
+
+  function configureMobileAudioSession() {
+    try {
+      if ("audioSession" in navigator && navigator.audioSession) {
+        navigator.audioSession.type = "playback";
+      }
+    } catch (_) {}
+  }
+
   function ensureAudioCtx() {
+    configureMobileAudioSession();
     if (!audioCtx) {
       const AC = window.AudioContext || window.webkitAudioContext;
       if (AC) audioCtx = new AC();
@@ -481,6 +668,24 @@
     }
     return audioCtx;
   }
+
+  function unlockMobileSpeechAndAudio() {
+    ensureAudioCtx();
+    if (!("speechSynthesis" in window)) return;
+    populateVoices();
+    if (!state.speechUnlocked) {
+      state.speechUnlocked = true;
+      try {
+        window.speechSynthesis.resume();
+        const warm = new SpeechSynthesisUtterance("");
+        warm.volume = 0;
+        window.speechSynthesis.speak(warm);
+      } catch (_) {}
+    }
+  }
+
+  window.addEventListener("touchstart", unlockMobileSpeechAndAudio, { once: true, passive: true });
+  window.addEventListener("click", unlockMobileSpeechAndAudio, { once: true });
 
   function playBoxingBell(strikes = 1) {
     const ctx = ensureAudioCtx();
@@ -494,7 +699,7 @@
         osc.type = idx % 2 === 0 ? "sine" : "triangle";
         osc.frequency.setValueAtTime(freq, startTime);
 
-        const peak = 0.26 / (idx + 1);
+        const peak = 0.28 / (idx + 1);
         gain.gain.setValueAtTime(0.0001, startTime);
         gain.gain.exponentialRampToValueAtTime(peak, startTime + 0.008);
         gain.gain.exponentialRampToValueAtTime(0.0001, startTime + 1.85 / (idx * 0.5 + 1));
@@ -505,6 +710,23 @@
         osc.stop(startTime + 1.9);
       });
     }
+  }
+
+  function playStrikePadCue(side) {
+    const ctx = ensureAudioCtx();
+    if (!ctx) return;
+    const t = ctx.currentTime;
+    const osc = ctx.createOscillator();
+    const gain = ctx.createGain();
+    osc.type = "triangle";
+    osc.frequency.setValueAtTime(side === "L" ? 520 : 390, t);
+    osc.frequency.exponentialRampToValueAtTime(140, t + 0.045);
+    gain.gain.setValueAtTime(0.08, t);
+    gain.gain.exponentialRampToValueAtTime(0.001, t + 0.05);
+    osc.connect(gain);
+    gain.connect(ctx.destination);
+    osc.start(t);
+    osc.stop(t + 0.055);
   }
 
   function playClapperWarning() {
@@ -536,7 +758,7 @@
     const gain = ctx.createGain();
     osc.type = "sine";
     osc.frequency.setValueAtTime(880, t);
-    gain.gain.setValueAtTime(0.14, t);
+    gain.gain.setValueAtTime(0.15, t);
     gain.gain.exponentialRampToValueAtTime(0.001, t + 0.09);
     osc.connect(gain);
     gain.connect(ctx.destination);
@@ -544,25 +766,21 @@
     osc.stop(t + 0.1);
   }
 
-  // ---------------------------------------------------------------------------
-  // 5. VOICE SYNTHESIS & ANNOUNCER ENGINE
-  // ---------------------------------------------------------------------------
   function populateVoices() {
     if (!("speechSynthesis" in window)) {
       el.voiceSelect.innerHTML = `<option value="">Speech Synthesis Unsupported</option>`;
       return;
     }
     const rawVoices = window.speechSynthesis.getVoices() || [];
+    if (rawVoices.length === 0) return;
     state.voices = rawVoices;
 
-    if (rawVoices.length === 0) return;
-
     const currentSelection = state.selectedVoiceURI;
-    el.voiceSelect.innerHTML = "";
+    el.voiceSelect.innerHTML = `<option value="">Default Device Voice (Recommended on Mobile)</option>`;
 
     const sorted = [...rawVoices].sort((a, b) => {
-      const aEn = a.lang.toLowerCase().startsWith("en") ? 0 : 1;
-      const bEn = b.lang.toLowerCase().startsWith("en") ? 0 : 1;
+      const aEn = (a.lang || "").toLowerCase().startsWith("en") ? 0 : 1;
+      const bEn = (b.lang || "").toLowerCase().startsWith("en") ? 0 : 1;
       if (aEn !== bEn) return aEn - bEn;
       return a.name.localeCompare(b.name);
     });
@@ -576,16 +794,6 @@
 
     if (currentSelection && sorted.some((v) => v.voiceURI === currentSelection)) {
       el.voiceSelect.value = currentSelection;
-    } else {
-      const preferred = sorted.find(
-        (v) =>
-          v.lang.toLowerCase().startsWith("en") &&
-          (v.name.includes("Natural") || v.name.includes("David") || v.name.includes("Guy") || v.name.includes("Mark"))
-      ) || sorted[0];
-      if (preferred) {
-        state.selectedVoiceURI = preferred.voiceURI;
-        el.voiceSelect.value = preferred.voiceURI;
-      }
     }
   }
 
@@ -595,35 +803,65 @@
   }
 
   function speakText(text) {
-    if (!("speechSynthesis" in window)) return;
-    window.speechSynthesis.cancel();
+    if (!("speechSynthesis" in window) || !text) return;
+    configureMobileAudioSession();
 
-    const utter = new SpeechSynthesisUtterance(text);
-    const chosen = state.voices.find((v) => v.voiceURI === el.voiceSelect.value);
-    if (chosen) utter.voice = chosen;
+    try {
+      if (window.speechSynthesis.speaking || window.speechSynthesis.pending) {
+        window.speechSynthesis.cancel();
+      }
+      window.speechSynthesis.resume();
 
-    utter.rate = parseFloat(el.voiceRateInput.value) || 1.1;
-    utter.pitch = parseFloat(el.voicePitchInput.value) || 0.95;
-    utter.volume = 1.0;
+      const speakNow = () => {
+        const utter = new SpeechSynthesisUtterance(text);
+        utter.lang = "en-US";
+        const selectedURI = el.voiceSelect.value;
+        if (selectedURI && state.voices.length > 0) {
+          const chosen = state.voices.find((v) => v.voiceURI === selectedURI || v.name === selectedURI);
+          if (chosen) {
+            utter.voice = chosen;
+            if (chosen.lang) utter.lang = chosen.lang;
+          }
+        }
 
-    window.speechSynthesis.speak(utter);
+        utter.rate = Math.max(0.7, Math.min(1.8, parseFloat(el.voiceRateInput.value) || 1.1));
+        utter.pitch = Math.max(0.5, Math.min(1.5, parseFloat(el.voicePitchInput.value) || 0.95));
+        utter.volume = 1.0;
+
+        window.speechSynthesis.speak(utter);
+      };
+
+      setTimeout(speakNow, 35);
+    } catch (_) {}
   }
 
   // ---------------------------------------------------------------------------
-  // 6. DUTCH ALTERNATING COMBINATION ENGINE & KINETIC BAG VISUALIZER
+  // 5. DUTCH ALTERNATING COMBINATION ENGINE (WITH CONFIGURABLE COMBO LENGTH)
   // ---------------------------------------------------------------------------
-  function generateProceduralAlternatingCombo() {
-    const length = Math.random() > 0.35 ? 4 : 5;
+  function resolveTargetLength() {
+    const mode = state.comboLengthMode || "mix";
+    if (mode === "mix") {
+      const choices = [3, 4, 4, 5, 5, 6];
+      return choices[Math.floor(Math.random() * choices.length)];
+    }
+    return parseInt(mode, 10) || 4;
+  }
+
+  function generateProceduralAlternatingCombo(forcedLength, styleKey) {
+    const length = forcedLength || resolveTargetLength();
+    const isBoxing = styleKey === "boxing";
+    const pools = isBoxing ? BOXING_POOLS : PROCEDURAL_POOLS;
+
     let currentSide = Math.random() > 0.25 ? "L" : "R";
     const chain = [];
 
     for (let i = 0; i < length; i++) {
-      const pool = PROCEDURAL_POOLS[currentSide];
+      const pool = pools[currentSide];
       let candidates = pool;
-      if (i === length - 1) {
+      if (!isBoxing && i === length - 1) {
         const finishers = pool.filter((s) => s.name.includes("Kick") || s.name.includes("Knee"));
         if (finishers.length > 0) candidates = finishers;
-      } else {
+      } else if (!isBoxing) {
         const setups = pool.filter((s) => !s.name.includes("High Kick"));
         if (setups.length > 0) candidates = setups;
       }
@@ -665,20 +903,34 @@
 
   function pickNextCombo() {
     const style = el.comboStyleSelect.value;
-    if (style === "procedural") {
-      return generateProceduralAlternatingCombo();
-    }
     if (style === "custom-only" && state.customCombos.length > 0) {
       const raw = state.customCombos[Math.floor(Math.random() * state.customCombos.length)];
       return parseCustomComboToChain(raw);
     }
 
-    const pool = COMBO_LIBRARY[style] || COMBO_LIBRARY["dutch-mma"];
-    let candidate = pool[Math.floor(Math.random() * pool.length)];
-    if (pool.length > 1 && candidate === state.currentCombo) {
-      candidate = pool[(pool.indexOf(candidate) + 1) % pool.length];
+    const targetLen = resolveTargetLength();
+    if (style === "procedural") {
+      return generateProceduralAlternatingCombo(targetLen, "dutch-mma");
     }
-    return candidate;
+
+    const pool = COMBO_LIBRARY[style] || COMBO_LIBRARY["dutch-mma"];
+    const matchingLen = state.comboLengthMode === "mix"
+      ? pool
+      : pool.filter((c) => c.length === targetLen);
+
+    if (matchingLen.length > 0) {
+      let candidate = matchingLen[Math.floor(Math.random() * matchingLen.length)];
+      if (matchingLen.length > 1 && candidate === state.currentCombo) {
+        candidate = matchingLen[(matchingLen.indexOf(candidate) + 1) % matchingLen.length];
+      }
+      // 35% of the time in fixed-length mode, also blend in a procedural alternating combo of that exact length for infinite variety!
+      if (state.comboLengthMode !== "mix" && Math.random() < 0.35) {
+        return generateProceduralAlternatingCombo(targetLen, style);
+      }
+      return candidate;
+    }
+
+    return generateProceduralAlternatingCombo(targetLen, style);
   }
 
   function formatComboText(chain) {
@@ -720,12 +972,16 @@
     el.comboDisplay.textContent = headline;
 
     const isStrictAlternating = verifyAlternatingChain(chain);
-    const sidePattern = chain.map((s) => s.side).join(" → ");
+    const sidePattern = chain.map((s) => s.side).join("→");
     el.altProofBadge.textContent = isStrictAlternating
-      ? `✔ STRICT ALTERNATING (${sidePattern})`
-      : `FLOW PATTERN (${sidePattern})`;
+      ? `✔ ${chain.length}-COUNT L↔R (${sidePattern})`
+      : `${chain.length}-COUNT (${sidePattern})`;
 
-    el.comboBreakdown.style.setProperty("--strike-count", String(chain.length));
+    // For 6 strikes use 3 columns (3x2), for 8 strikes use 4 columns (4x2)
+    let gridCols = chain.length;
+    if (chain.length === 6) gridCols = 3;
+    else if (chain.length >= 7) gridCols = 4;
+    el.comboBreakdown.style.setProperty("--strike-count", String(gridCols));
     el.comboBreakdown.innerHTML = "";
     const mode = el.calloutModeSelect.value;
 
@@ -769,8 +1025,11 @@
           void el.bagSwingWrapper.offsetWidth;
           el.bagSwingWrapper.classList.add(strike.side === "L" ? "swing-L" : "swing-R");
         }
+        if (shouldSpeak && el.comboEnabledToggle.checked) {
+          playStrikePadCue(strike.side);
+        }
         el.bagActiveCallout.textContent = `${idx + 1}/${chain.length}: ${strike.name} (${strike.side})`;
-      }, idx * 410);
+      }, idx * 380);
       state.zoneAnimTimers.push(timerId);
     });
 
@@ -778,7 +1037,7 @@
       if (el.bagSwingWrapper) {
         el.bagSwingWrapper.classList.remove("swing-L", "swing-R");
       }
-    }, chain.length * 410 + 350);
+    }, chain.length * 380 + 350);
     state.zoneAnimTimers.push(resetSwingId);
 
     if (shouldSpeak && el.comboEnabledToggle.checked) {
@@ -802,7 +1061,7 @@
   }
 
   // ---------------------------------------------------------------------------
-  // 7. HIGH-PRECISION CHRONO STATE MACHINE
+  // 6. HIGH-PRECISION CHRONO & CALORIE STATE MACHINE
   // ---------------------------------------------------------------------------
   const CIRCUMFERENCE = 2 * Math.PI * 132; // r=132 -> 829.38
 
@@ -815,7 +1074,7 @@
 
   function renderRoundPips() {
     el.roundPips.innerHTML = "";
-    const count = Math.min(state.totalRounds, 12);
+    const count = Math.min(state.totalRounds, 10);
     for (let i = 1; i <= count; i++) {
       const pip = document.createElement("span");
       pip.className = "round-pip";
@@ -830,7 +1089,12 @@
     el.timeDisplay.textContent = formatMMSS(secLeft);
     el.roundCounter.innerHTML = `${String(state.currentRound).padStart(2, "0")} <small>/ ${String(state.totalRounds).padStart(2, "0")}</small>`;
     el.statCombos.textContent = String(state.combosCalled);
+    el.statCalories.textContent = String(Math.round(state.totalCaloriesKcal));
     el.statWorkTime.textContent = formatMMSS(state.totalWorkElapsedMs / 1000);
+
+    if (el.statKcalRate) {
+      el.statKcalRate.textContent = `${state.currentKcalPerMin.toFixed(1)} kcal/m`;
+    }
 
     const fraction = state.phaseDurationMs > 0
       ? Math.max(0, Math.min(1, state.remainingMs / state.phaseDurationMs))
@@ -910,6 +1174,9 @@
       state.totalWorkElapsedMs += dt;
     }
 
+    state.currentKcalPerMin = calculateBurnRateKcalPerMin();
+    state.totalCaloriesKcal += state.currentKcalPerMin * (dt / 60000);
+
     const secCeil = Math.ceil(state.remainingMs / 1000);
 
     if (
@@ -960,14 +1227,12 @@
     if ("wakeLock" in navigator) {
       try {
         state.wakeLock = await navigator.wakeLock.request("screen");
-      } catch (_) {
-        // Ignore if disallowed
-      }
+      } catch (_) {}
     }
   }
 
   function toggleStartPause() {
-    ensureAudioCtx();
+    unlockMobileSpeechAndAudio();
     requestScreenWakeLock();
     if (!state.isRunning) {
       if (state.phase === "idle" || state.phase === "done") {
@@ -975,6 +1240,7 @@
         state.currentRound = 1;
         state.combosCalled = 0;
         state.totalWorkElapsedMs = 0;
+        state.totalCaloriesKcal = 0;
         if (state.prepSec > 0) {
           enterPhase("prep");
         } else {
@@ -1007,6 +1273,8 @@
     syncSettingsFromInputs();
     state.phase = "idle";
     state.currentRound = 1;
+    state.totalCaloriesKcal = 0;
+    state.currentKcalPerMin = state.currentBpm >= 75 ? calculateBurnRateKcalPerMin() : 0;
     state.remainingMs = state.workSec * 1000;
     state.phaseDurationMs = state.workSec * 1000;
     el.body.setAttribute("data-phase", "idle");
@@ -1020,7 +1288,7 @@
   }
 
   // ---------------------------------------------------------------------------
-  // 8. UI CONTROLS, DISCIPLINE SWITCHING & CUSTOM COMBO MANAGEMENT
+  // 7. UI CONTROLS, MOBILE TABS, COMBO LENGTH & CUSTOM COMBO MANAGEMENT
   // ---------------------------------------------------------------------------
   function syncSettingsFromInputs() {
     state.totalRounds = Math.max(1, parseInt(el.roundsInput.value, 10) || 5);
@@ -1029,6 +1297,7 @@
     state.prepSec = Math.max(0, parseInt(el.prepSecInput.value, 10) || 0);
     state.warnSec = Math.max(0, parseInt(el.warnSecInput.value, 10) || 0);
     state.maxHr = Math.max(120, parseInt(el.maxHrInput.value, 10) || 190);
+    state.weightLbs = Math.max(80, parseInt(el.weightLbsInput?.value, 10) || 180);
 
     el.roundsFormatted.textContent = `${state.totalRounds} RDS`;
     el.workFormatted.textContent = formatMMSS(state.workSec);
@@ -1036,6 +1305,7 @@
     el.prepFormatted.textContent = formatMMSS(state.prepSec);
     el.warnFormatted.textContent = formatMMSS(state.warnSec);
     el.maxHrFormatted.textContent = `${state.maxHr} BPM`;
+    if (el.weightFormatted) el.weightFormatted.textContent = `${state.weightLbs} LB`;
 
     if (state.phase === "idle") {
       state.remainingMs = state.workSec * 1000;
@@ -1043,6 +1313,18 @@
       renderRoundPips();
       updateDisplay();
     }
+  }
+
+  function setComboLengthMode(lenKey) {
+    state.comboLengthMode = lenKey;
+    if (el.comboLengthSelect) {
+      el.comboLengthSelect.value = lenKey;
+    }
+    document.querySelectorAll(".len-pill").forEach((btn) => {
+      btn.classList.toggle("active", btn.dataset.len === lenKey);
+    });
+    const next = pickNextCombo();
+    renderAndAnimateCombo(next, false);
   }
 
   function setDisciplineMode(modeKey) {
@@ -1056,13 +1338,13 @@
     });
 
     const labels = {
-      "dutch-mma": "DUTCH MMA • STRICT L↔R",
-      "dutch-kickboxing": "DUTCH KICKBOXING • STRICT L↔R",
-      "boxing": "PURE BOXING • STRICT L↔R",
-      "procedural": "PROCEDURAL L↔R ENGINE",
-      "custom-only": "CUSTOM USER ARSENAL"
+      "dutch-mma": "DUTCH MMA • L↔R",
+      "dutch-kickboxing": "DUTCH KICK • L↔R",
+      "boxing": "PURE BOXING • L↔R",
+      "procedural": "PROCEDURAL L↔R",
+      "custom-only": "CUSTOM ARSENAL"
     };
-    el.disciplineBadge.textContent = labels[modeKey] || "DUTCH MMA • STRICT L↔R";
+    el.disciplineBadge.textContent = labels[modeKey] || "DUTCH MMA • L↔R";
 
     const preview = pickNextCombo();
     renderAndAnimateCombo(preview, false);
@@ -1080,6 +1362,28 @@
     });
   }
 
+  // Mobile Bottom Navigation Tab Switching
+  document.querySelectorAll(".mob-tab-btn").forEach((btn) => {
+    btn.addEventListener("click", () => {
+      const tab = btn.dataset.mobTab;
+      document.querySelectorAll(".mob-tab-btn").forEach((b) => b.classList.remove("active"));
+      btn.classList.add("active");
+      el.body.setAttribute("data-mobile-tab", tab);
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    });
+  });
+
+  // Quick Combo Length Pills & Dropdown
+  document.querySelectorAll(".len-pill").forEach((pill) => {
+    pill.addEventListener("click", () => setComboLengthMode(pill.dataset.len));
+  });
+
+  if (el.comboLengthSelect) {
+    el.comboLengthSelect.addEventListener("change", () => {
+      setComboLengthMode(el.comboLengthSelect.value);
+    });
+  }
+
   // Event Listeners
   el.startPauseBtn.addEventListener("click", toggleStartPause);
   el.resetBtn.addEventListener("click", resetWorkout);
@@ -1091,7 +1395,7 @@
   el.polarSimBtn.addEventListener("click", togglePolarSimulation);
 
   el.triggerComboBtn.addEventListener("click", () => {
-    ensureAudioCtx();
+    unlockMobileSpeechAndAudio();
     const combo = pickNextCombo();
     state.combosCalled++;
     renderAndAnimateCombo(combo, true);
@@ -1099,15 +1403,17 @@
   });
 
   el.prevComboBtn.addEventListener("click", () => {
-    ensureAudioCtx();
+    unlockMobileSpeechAndAudio();
     renderAndAnimateCombo(state.currentCombo, true);
   });
 
   el.soundBellTestBtn.addEventListener("click", () => {
+    unlockMobileSpeechAndAudio();
     playBoxingBell(1);
   });
 
   el.testVoiceBtn.addEventListener("click", () => {
+    unlockMobileSpeechAndAudio();
     speakText(formatSpokenComboText(state.currentCombo));
   });
 
@@ -1163,12 +1469,21 @@
     });
   });
 
-  [el.roundsInput, el.workSecInput, el.restSecInput, el.prepSecInput, el.warnSecInput, el.maxHrInput].forEach((inp) => {
-    inp.addEventListener("change", syncSettingsFromInputs);
+  [
+    el.roundsInput,
+    el.workSecInput,
+    el.restSecInput,
+    el.prepSecInput,
+    el.warnSecInput,
+    el.maxHrInput,
+    el.weightLbsInput
+  ].forEach((inp) => {
+    if (inp) inp.addEventListener("change", syncSettingsFromInputs);
   });
 
   document.querySelectorAll(".persona-pill").forEach((pill) => {
     pill.addEventListener("click", () => {
+      unlockMobileSpeechAndAudio();
       const p = VOICE_PERSONAS[pill.dataset.persona];
       if (!p) return;
       document.querySelectorAll(".persona-pill").forEach((b) => b.classList.remove("active"));
@@ -1190,11 +1505,13 @@
   });
 
   el.voiceSelect.addEventListener("change", () => {
+    unlockMobileSpeechAndAudio();
     state.selectedVoiceURI = el.voiceSelect.value;
     speakText(formatSpokenComboText(state.currentCombo));
   });
 
   el.addComboBtn.addEventListener("click", () => {
+    unlockMobileSpeechAndAudio();
     const val = el.customComboInput.value.trim();
     if (!val) return;
     state.customCombos.unshift(val);

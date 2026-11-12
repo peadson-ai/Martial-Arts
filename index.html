@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
   <meta name="theme-color" content="#07090e" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
@@ -13,7 +13,7 @@
   <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:ital,wght@0,600;0,700;0,800;0,900;1,800&family=JetBrains+Mono:wght@500;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="styles.css" />
 </head>
-<body data-phase="idle" data-discipline="dutch-mma">
+<body data-phase="idle" data-discipline="dutch-mma" data-mobile-tab="workout">
   <!-- Ambient Arena Lighting Backdrop -->
   <div class="arena-backdrop" aria-hidden="true">
     <div class="arena-glow glow-primary"></div>
@@ -24,20 +24,33 @@
   <div class="app-shell">
     <!-- Top Tactical Telemetry Bar -->
     <header class="top-nav">
-      <div class="brand-lockup">
-        <div class="brand-emblem">
-          <svg viewBox="0 0 36 36" fill="none" aria-hidden="true">
-            <path d="M6 10L18 3L30 10V26L18 33L6 26V10Z" stroke="currentColor" stroke-width="2.5"/>
-            <path d="M12 18H24M18 11V25" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"/>
-          </svg>
+      <div class="brand-row">
+        <div class="brand-lockup">
+          <div class="brand-emblem">
+            <svg viewBox="0 0 36 36" fill="none" aria-hidden="true">
+              <path d="M6 10L18 3L30 10V26L18 33L6 26V10Z" stroke="currentColor" stroke-width="2.5"/>
+              <path d="M12 18H24M18 11V25" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"/>
+            </svg>
+          </div>
+          <div class="brand-titles">
+            <div class="brand-kicker">ALTERNATING L&harr;R &bull; POLAR BLE &bull; KCAL</div>
+            <h1 class="brand-name">STRIKE<span>//</span>OS</h1>
+          </div>
         </div>
-        <div class="brand-titles">
-          <div class="brand-kicker">HEAVY BAG TELEMETRY &bull; ALTERNATING L&harr;R &bull; POLAR BLE</div>
-          <h1 class="brand-name">STRIKE<span>//</span>OS</h1>
+
+        <!-- Right Utility Actions (Polar HR Connect & Fullscreen) -->
+        <div class="nav-utilities">
+          <button id="polar-connect-btn" class="polar-btn" type="button" title="Connect Polar H10 / H9 / Verity Sense via Bluetooth">
+            <span class="heart-icon" id="nav-heart-icon">&#x2665;</span>
+            <span id="polar-btn-label">POLAR HR</span>
+          </button>
+          <button id="fullscreen-btn" class="utility-btn hide-on-ios" type="button" title="Toggle Fullscreen Gym Mode">
+            &#x26F6;
+          </button>
         </div>
       </div>
 
-      <!-- Quick Discipline Switcher (Instant Access) -->
+      <!-- Quick Discipline Switcher (Horizontally scrollable pill bar on mobile) -->
       <div class="mode-switcher" role="tablist" aria-label="Combat Discipline">
         <button class="mode-pill active" data-mode="dutch-mma" role="tab" aria-selected="true" type="button">
           <span class="mode-dot"></span>Dutch MMA
@@ -52,23 +65,12 @@
           <span class="mode-dot"></span>Procedural L&harr;R
         </button>
       </div>
-
-      <!-- Right Utility Actions (Polar HR Connect, Wake Lock & Fullscreen) -->
-      <div class="nav-utilities">
-        <button id="polar-connect-btn" class="polar-btn" type="button" title="Connect Polar H10 / H9 / Verity Sense via Bluetooth">
-          <span class="heart-icon" id="nav-heart-icon">&#x2665;</span>
-          <span id="polar-btn-label">CONNECT POLAR HR</span>
-        </button>
-        <button id="fullscreen-btn" class="utility-btn" type="button" title="Toggle Fullscreen Gym Mode">
-          &#x26F6; FULLSCREEN
-        </button>
-      </div>
     </header>
 
     <!-- Main Command Deck -->
     <main class="command-deck">
-      <!-- LEFT COLUMN: Primary Chrono Stage, Polar Biometrics & Live Combo Visualizer -->
-      <section class="chrono-stage" aria-live="polite">
+      <!-- LEFT COLUMN (Mobile Tab: workout): Primary Chrono Stage, Polar Biometrics & Live Combo Visualizer -->
+      <section class="chrono-stage mobile-panel" data-panel="workout" aria-live="polite">
         <!-- Top Status Strip inside Stage -->
         <div class="stage-telemetry-header">
           <div class="phase-indicator">
@@ -77,13 +79,13 @@
           </div>
 
           <div class="round-matrix">
-            <span class="matrix-label">ROUND</span>
+            <span class="matrix-label">RD</span>
             <span id="round-counter" class="matrix-value">01 <small>/ 05</small></span>
             <div id="round-pips" class="round-pips" aria-hidden="true"></div>
           </div>
         </div>
 
-        <!-- Centerpiece: Radial Chrono + 3D Heavy Bag Target Visualizer -->
+        <!-- Centerpiece: Radial Chrono + 3D Heavy Bag Target Visualizer (Side-by-side even on mobile!) -->
         <div class="centerpiece-grid">
           <!-- Radial SVG Chrono Ring -->
           <div class="chrono-dial-container">
@@ -117,7 +119,7 @@
             </svg>
 
             <div class="chrono-readout">
-              <div id="discipline-badge" class="discipline-readout-tag">DUTCH MMA &bull; STRICT L&harr;R</div>
+              <div id="discipline-badge" class="discipline-readout-tag">DUTCH MMA &bull; L&harr;R</div>
               <div id="time-display" class="time-numerals">03:00</div>
               <div class="chrono-submetrics">
                 <div class="submetric">
@@ -126,13 +128,13 @@
                 </div>
                 <div class="submetric-divider"></div>
                 <div class="submetric">
-                  <span class="sub-lbl">BAG TIME</span>
-                  <span id="stat-work-time" class="sub-val">00:00</span>
+                  <span class="sub-lbl">KCAL</span>
+                  <span id="stat-calories" class="sub-val kcal-highlight">0</span>
                 </div>
                 <div class="submetric-divider"></div>
                 <div class="submetric">
-                  <span class="sub-lbl">PEAK HR</span>
-                  <span id="stat-peak-hr" class="sub-val">--</span>
+                  <span class="sub-lbl">WORK</span>
+                  <span id="stat-work-time" class="sub-val">00:00</span>
                 </div>
               </div>
             </div>
@@ -141,10 +143,10 @@
           <!-- 3D Heavy Bag Strike Zone Visualizer -->
           <div class="bag-visualizer-card">
             <div class="bag-header">
-              <span class="bag-title">KINETIC BAG TARGETS</span>
+              <span class="bag-title">BAG TARGETS</span>
               <div class="stance-legend">
-                <span class="legend-item lead-item"><i class="dot-lead"></i>LEAD (L)</span>
-                <span class="legend-item rear-item"><i class="dot-rear"></i>REAR (R)</span>
+                <span class="legend-item lead-item"><i class="dot-lead"></i>L</span>
+                <span class="legend-item rear-item"><i class="dot-rear"></i>R</span>
               </div>
             </div>
 
@@ -201,48 +203,7 @@
                 <text x="115.5" y="245" class="zone-label">LOW R</text>
               </svg>
             </div>
-            <div id="bag-active-callout" class="bag-active-callout">Alternating L &rarr; R Flow Ready</div>
-          </div>
-        </div>
-
-        <!-- Polar BLE Heart Rate Biometrics Telemetry Strip -->
-        <div class="polar-telemetry-strip" id="polar-strip" data-hr-zone="0">
-          <div class="polar-left">
-            <div class="bpm-readout-box">
-              <span class="bpm-heart" id="bpm-heart-anim">&#x2665;</span>
-              <span id="bpm-value" class="bpm-numerals">--</span>
-              <div class="bpm-unit-stack">
-                <span class="bpm-unit">BPM</span>
-                <span id="hr-pct-max" class="bpm-pct">--% MAX</span>
-              </div>
-            </div>
-            <div class="polar-meta">
-              <div class="polar-device-row">
-                <span id="polar-status-text" class="polar-device-name">POLAR BLE SENSOR: STANDBY</span>
-                <span id="polar-zone-pill" class="hr-zone-pill">ZONE --</span>
-              </div>
-              <div class="hr-zone-bar" aria-label="Heart Rate Training Zone">
-                <div class="hr-zone-seg z1"><span>Z1</span></div>
-                <div class="hr-zone-seg z2"><span>Z2</span></div>
-                <div class="hr-zone-seg z3"><span>Z3</span></div>
-                <div class="hr-zone-seg z4"><span>Z4</span></div>
-                <div class="hr-zone-seg z5"><span>Z5</span></div>
-                <div id="hr-zone-marker" class="hr-zone-marker" style="left: 0%"></div>
-              </div>
-            </div>
-          </div>
-
-          <div class="polar-right">
-            <canvas id="hr-sparkline" width="160" height="44" aria-label="Live Heart Rate Trend"></canvas>
-            <div class="polar-Quick-actions">
-              <div class="hrr-metric" title="Heart Rate Recovery Drop during Rest">
-                <span class="sub-lbl">RECOVERY</span>
-                <span id="stat-hrr" class="sub-val">-- BPM</span>
-              </div>
-              <button id="polar-sim-btn" class="action-chip" type="button" title="Simulate Polar H10 Live Stream">
-                Sim HR
-              </button>
-            </div>
+            <div id="bag-active-callout" class="bag-active-callout">L &rarr; R Flow Ready</div>
           </div>
         </div>
 
@@ -250,15 +211,23 @@
         <div class="combo-telemetry-deck" id="combo-stage">
           <div class="combo-deck-top">
             <div class="combo-deck-titles">
-              <span class="combo-kicker">LIVE COMBINATION CALLOUT</span>
-              <span id="alternating-proof-badge" class="alt-proof-badge">&#x2714; STRICT L&harr;R ALTERNATING</span>
+              <span class="combo-kicker">LIVE COMBO</span>
+              <span id="alternating-proof-badge" class="alt-proof-badge">&#x2714; STRICT L&harr;R</span>
             </div>
             <div class="combo-deck-actions">
+              <div class="length-pills" role="group" aria-label="Techniques per Combo">
+                <button type="button" class="len-pill active" data-len="mix" title="Mixed 3 to 6 strikes">Mix</button>
+                <button type="button" class="len-pill" data-len="3" title="3 techniques per combo">3</button>
+                <button type="button" class="len-pill" data-len="4" title="4 techniques per combo">4</button>
+                <button type="button" class="len-pill" data-len="5" title="5 techniques per combo">5</button>
+                <button type="button" class="len-pill" data-len="6" title="6 techniques per combo">6</button>
+                <button type="button" class="len-pill" data-len="8" title="8 techniques per combo">8</button>
+              </div>
               <button id="prev-combo-btn" class="action-chip" type="button" title="Replay current combination voice">
-                &#x1F501; Replay
+                &#x1F501;
               </button>
               <button id="trigger-combo-btn" class="action-chip accent-chip" type="button" title="Call next combination immediately">
-                &#x1F50A; Call Next Combo
+                &#x1F50A; Next
               </button>
             </div>
           </div>
@@ -279,22 +248,67 @@
             <span id="start-pause-label">START WORKOUT</span>
           </button>
           <button id="skip-phase-btn" class="dock-btn btn-skip" type="button" disabled>
-            <span>SKIP PHASE &raquo;</span>
+            <span>SKIP &raquo;</span>
           </button>
           <button id="reset-btn" class="dock-btn btn-reset" type="button">
             <span>RESET</span>
           </button>
         </div>
+
+        <!-- Polar BLE Heart Rate & Calorie Biometrics Strip -->
+        <div class="polar-telemetry-strip" id="polar-strip" data-hr-zone="0">
+          <div class="polar-left">
+            <div class="bpm-readout-box">
+              <span class="bpm-heart" id="bpm-heart-anim">&#x2665;</span>
+              <span id="bpm-value" class="bpm-numerals">--</span>
+              <div class="bpm-unit-stack">
+                <span class="bpm-unit">BPM</span>
+                <span id="hr-pct-max" class="bpm-pct">--%</span>
+              </div>
+            </div>
+            <div class="polar-meta">
+              <div class="polar-device-row">
+                <span id="polar-status-text" class="polar-device-name">POLAR BLE: STANDBY</span>
+                <span id="polar-zone-pill" class="hr-zone-pill">ZONE --</span>
+              </div>
+              <div class="hr-zone-bar" aria-label="Heart Rate Training Zone">
+                <div class="hr-zone-seg z1"><span>Z1</span></div>
+                <div class="hr-zone-seg z2"><span>Z2</span></div>
+                <div class="hr-zone-seg z3"><span>Z3</span></div>
+                <div class="hr-zone-seg z4"><span>Z4</span></div>
+                <div class="hr-zone-seg z5"><span>Z5</span></div>
+                <div id="hr-zone-marker" class="hr-zone-marker" style="left: 0%"></div>
+              </div>
+            </div>
+          </div>
+
+          <div class="polar-right">
+            <canvas id="hr-sparkline" width="110" height="36" aria-label="Live Heart Rate Trend"></canvas>
+            <div class="polar-Quick-actions">
+              <div class="hrr-metric" title="Active Calorie Burn & Rate (Polar HR / METs)">
+                <span class="sub-lbl">BURN RATE</span>
+                <span id="stat-kcal-rate" class="sub-val kcal-highlight">0.0 kcal/m</span>
+              </div>
+              <div class="hrr-metric" title="Heart Rate Recovery Drop during Rest">
+                <span class="sub-lbl">RECOVERY</span>
+                <span id="stat-hrr" class="sub-val">-- BPM</span>
+              </div>
+              <button id="polar-sim-btn" class="action-chip" type="button" title="Simulate Polar H10 Live Stream">
+                Sim HR
+              </button>
+            </div>
+          </div>
+        </div>
       </section>
 
       <!-- RIGHT COLUMN: Precision Control & Voice Studio -->
       <aside class="control-tower">
-        <!-- Card 1: Round & Interval Architecture -->
-        <section class="tower-card">
+        <!-- Card 1 (Mobile Tab: timers): Round & Interval Architecture -->
+        <section class="tower-card mobile-panel" data-panel="timers">
           <div class="tower-card-header">
             <div>
               <span class="card-kicker">INTERVAL ARCHITECTURE</span>
-              <h2>Round &amp; Timer Controls</h2>
+              <h2>Round &amp; Biometric Controls</h2>
             </div>
             <button id="sound-bell-test-btn" class="action-chip" type="button" title="Test Gym Bell Audio">
               &#x1F514; Test Bell
@@ -379,7 +393,7 @@
             <div class="param-row">
               <div class="param-meta">
                 <label for="max-hr-input">Max Heart Rate</label>
-                <span class="param-sub">For Polar Zone 1&ndash;5 calibration</span>
+                <span class="param-sub">Polar Zone 1&ndash;5 calibration</span>
               </div>
               <div class="param-controls">
                 <button class="step-btn" data-target="max-hr-input" data-step="-5" type="button">&minus;5</button>
@@ -388,11 +402,24 @@
                 <span id="max-hr-formatted" class="param-badge">190 BPM</span>
               </div>
             </div>
+
+            <div class="param-row">
+              <div class="param-meta">
+                <label for="weight-lbs-input">Body Weight (lbs)</label>
+                <span class="param-sub">Calibrates Polar HR calorie burn</span>
+              </div>
+              <div class="param-controls">
+                <button class="step-btn" data-target="weight-lbs-input" data-step="-5" type="button">&minus;5</button>
+                <input id="weight-lbs-input" type="number" min="90" max="350" step="1" value="180" />
+                <button class="step-btn" data-target="weight-lbs-input" data-step="5" type="button">+5</button>
+                <span id="weight-formatted" class="param-badge">180 LB</span>
+              </div>
+            </div>
           </div>
         </section>
 
-        <!-- Card 2: Dutch Alternating Engine & Voice Selector -->
-        <section class="tower-card">
+        <!-- Card 2 (Mobile Tab: voice): Dutch Alternating Engine & Voice Selector -->
+        <section class="tower-card mobile-panel" data-panel="voice">
           <div class="tower-card-header">
             <div>
               <span class="card-kicker">VOICE &amp; STRIKE CALLER</span>
@@ -421,21 +448,33 @@
 
             <div class="field-row-2col">
               <div class="field-block">
+                <label for="combo-length-select">Techniques per Combo</label>
+                <select id="combo-length-select">
+                  <option value="mix" selected>Mixed Flow (3 to 6 Strikes)</option>
+                  <option value="3">3 Strikes (Fast Entry Chains)</option>
+                  <option value="4">4 Strikes (Classic Dutch 4-Count)</option>
+                  <option value="5">5 Strikes (5-Count Dutch Flow)</option>
+                  <option value="6">6 Strikes (High-Volume 6-Count)</option>
+                  <option value="8">8 Strikes (Dutch Marathon Flurry)</option>
+                </select>
+              </div>
+
+              <div class="field-block">
                 <label for="callout-mode-select">Callout Terminology</label>
                 <select id="callout-mode-select">
                   <option value="named" selected>Named (Jab, Cross, Hook...)</option>
                   <option value="numbered">Numbered (1, 2, 3, Low Kick...)</option>
                 </select>
               </div>
+            </div>
 
-              <div class="field-block">
-                <label for="combo-pace-select">Callout Interval</label>
-                <select id="combo-pace-select">
-                  <option value="slow">Technical (Every 9&ndash;12s)</option>
-                  <option value="medium" selected>Fight Pace (Every 6&ndash;8s)</option>
-                  <option value="fast">Dutch Volume (Every 3.5&ndash;5s)</option>
-                </select>
-              </div>
+            <div class="field-block">
+              <label for="combo-pace-select">Callout Interval</label>
+              <select id="combo-pace-select">
+                <option value="slow">Technical (Every 9&ndash;12s)</option>
+                <option value="medium" selected>Fight Pace (Every 6&ndash;8s)</option>
+                <option value="fast">Dutch Volume (Every 3.5&ndash;5s)</option>
+              </select>
             </div>
 
             <!-- Voice Selection Studio -->
@@ -456,7 +495,7 @@
               </div>
 
               <select id="voice-select" aria-label="System Speech Synthesis Voice">
-                <option value="">Loading System Voices...</option>
+                <option value="">Default Mobile / System Voice</option>
               </select>
 
               <div class="voice-sliders-row">
@@ -495,6 +534,26 @@
         </section>
       </aside>
     </main>
+
+    <!-- Mobile Bottom Navigation Dock (< 960px) -->
+    <nav class="mobile-bottom-nav" aria-label="Mobile View Switcher">
+      <button type="button" class="mob-tab-btn active" data-mob-tab="workout">
+        <span class="mob-tab-icon">&#x23F1;</span>
+        <span class="mob-tab-lbl">Bag Timer</span>
+      </button>
+      <button type="button" class="mob-tab-btn" data-mob-tab="timers">
+        <span class="mob-tab-icon">&#x2699;</span>
+        <span class="mob-tab-lbl">Rounds &amp; Kcal</span>
+      </button>
+      <button type="button" class="mob-tab-btn" data-mob-tab="voice">
+        <span class="mob-tab-icon">&#x1F50A;</span>
+        <span class="mob-tab-lbl">Voice &amp; Combos</span>
+      </button>
+      <button type="button" class="mob-tab-btn" data-mob-tab="all">
+        <span class="mob-tab-icon">&#x2630;</span>
+        <span class="mob-tab-lbl">All Panels</span>
+      </button>
+    </nav>
   </div>
 
   <script src="app.js"></script>
